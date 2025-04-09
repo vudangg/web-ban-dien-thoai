@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận thanh toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg text-center">
+        <h1 class="text-2xl font-bold text-center">Xác nhận thanh toán</h1>
+        <p class="mt-2 text-gray-700"><%= paymentInfo.message %></p>
+        
+        <% if (paymentInfo.qrImage) { %>
+            <img src="<%= paymentInfo.qrImage %>" alt="Mã QR thanh toán" class="mx-auto mt-4 w-48 h-48">
+        <% } %>
+        
+        <form action="/complete-checkout" method="POST" class="mt-6 text-center">
+            <button type=\"submit\" class=\"bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600\">Xác nhận thanh toán</button>
+        </form>
+    </div>
+</body>
+</html>

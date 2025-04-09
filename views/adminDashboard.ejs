@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Bảng điều khiển quản trị</h1>
+    <div>
+      <span class="mr-4">👋 Xin chào, <%= user?.name || 'Admin' %></span>
+      <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Đăng xuất</a>
+    </div>
+  </header>
+
+  <main class="p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Thống kê đơn giản -->
+      <div class="bg-white p-4 rounded shadow">
+        <h2 href="/products" class="text-lg font-semibold mb-2">Tổng sản phẩm</h2>
+        <p class="text-2xl font-bold text-blue-600"><%= productCount %></p>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h2 href="/admin/categories" class="text-lg font-semibold mb-2">Tổng danh mục</h2>
+        <p class="text-2xl font-bold text-green-600"><%= categoryCount %></p>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold mb-2">Người dùng</h2>
+        <p class="text-2xl font-bold text-yellow-600"><%= userCount %></p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-xl font-bold mb-4">Quản lý nhanh</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/products" class="block bg-blue-500 text-white p-4 rounded shadow hover:bg-blue-600 text-center font-semibold">📦 Quản lý sản phẩm</a>
+        <a href="/admin/categories" class="block bg-green-500 text-white p-4 rounded shadow hover:bg-green-600 text-center font-semibold">📁 Quản lý danh mục</a>
+        <a href="/register" class="block bg-yellow-500 text-white p-4 rounded shadow hover:bg-yellow-600 text-center font-semibold">👥 Thêm người dùng</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center mt-10 text-gray-500">
+    &copy; <%= new Date().getFullYear() %> - Trang quản trị hệ thống
+  </footer>
+</body>
+</html>

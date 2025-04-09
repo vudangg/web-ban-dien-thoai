@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin người dùng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Tiêu đề -->
+            <h1 class="text-3xl font-bold">Thông tin người dùng</h1>
+            <nav class="flex space-x-6">
+                <a href="/" class="text-white hover:text-yellow-300 transition duration-200">Trang chủ</a>
+                <a href="/userProfile" class="text-white hover:text-yellow-300 transition duration-200">Thông tin người dùng</a>
+                <a href="/cart" class="text-white hover:text-yellow-300 transition duration-200">Giỏ hàng</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Thông tin người dùng -->
+    <main class="container mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+
+        <h2 class="text-2xl font-semibold mb-6 text-gray-800">Thông tin cá nhân</h2>
+
+        <!-- Hiển thị thông tin người dùng -->
+        <div class="space-y-4">
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-700">Họ và tên:</span>
+                <span class="text-gray-600"><%= user.name %></span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-700">Email:</span>
+                <span class="text-gray-600"><%= user.email %></span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-700">Số điện thoại:</span>
+                <span class="text-gray-600"><%= user.phone %></span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-semibold text-gray-700">Địa chỉ:</span>
+                <span class="text-gray-600"><%= user.address %></span>
+            </div>
+        </div>
+
+        <!-- Nút chỉnh sửa thông tin người dùng -->
+        <div class="mt-6">
+            <a href="/profile/edit" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition duration-200">
+                ✏️ Chỉnh sửa thông tin
+            </a>
+        </div>
+
+    </main>
+
+</body>
+</html>

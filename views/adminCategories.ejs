@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><title>Quản lý danh mục</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <h1 class="text-2xl font-bold mb-4">📁 Quản lý danh mục</h1>
+  <a href="/admin" class="text-blue-500 hover:underline mb-4 inline-block">← Về Dashboard</a>
+
+  <form action="/admin/categories" method="POST" class="mb-6 flex gap-2">
+    <input name="name" placeholder="Tên danh mục" required class="px-4 py-2 border rounded"/>
+    <input name="description" placeholder="Mô tả" class="px-4 py-2 border rounded"/>
+    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Thêm mới</button>
+  </form>
+
+  <table class="min-w-full bg-white rounded shadow">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-2 text-left">Tên</th>
+        <th class="p-2 text-left">Mô tả</th>
+        <th class="p-2">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% categories.forEach(cat => { %>
+        <tr class="border-t hover:bg-gray-50">
+          <td class="p-2"><%= cat.name %></td>
+          <td class="p-2"><%= cat.description %></td>
+          <td class="p-2 text-center space-x-2">
+            <a href="/admin/categories/edit/<%= cat._id %>" class="text-yellow-500 hover:underline">✏️</a>
+            <form action="/admin/categories/delete/<%= cat._id %>" method="POST" class="inline">
+              <button type="submit" onclick="return confirm('Xác nhận xoá?');" class="text-red-500 hover:underline">🗑️</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || "Chi tiết sản phẩm" %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-500 text-white p-4 text-center">
+        <h1 class="text-2xl font-bold"><%= product.name %></h1>
+        <nav class="mt-2 space-x-4">
+            <a href="/" class="hover:underline">Trang chủ</a>
+            <a href="/products" class="hover:underline">Sản phẩm</a>
+            <a href="/cart" class="hover:underline">Giỏ hàng</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-bold"><%= product.name %></h2>
+        <img src="<%= product.image %>" alt="<%= product.name %>" class="w-64 h-64 object-cover mx-auto">
+        <p class="text-gray-700 mt-2">Giá: <%= product.price %> VND</p>
+        <p class="text-gray-500">Danh mục: <%= product.category ? product.category.name : "Chưa có danh mục" %></p>
+
+        <form action="/cart/add" method="POST" class="mt-4">
+            <input type="hidden" name="productId" value="<%= product._id %>">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Thêm vào giỏ</button>
+        </form>
+    </main>
+</body>
+</html>
