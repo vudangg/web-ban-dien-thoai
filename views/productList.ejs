@@ -11,7 +11,7 @@
 <body class="bg-gray-50 flex flex-col min-h-screen">
 
   <!-- Header -->
-  <header class="bg-red-600 text-white">
+  <header class="bg-red-600 text-white">    
     <div class="container mx-auto flex items-center justify-between px-6 py-3">
       <!-- Left: Home + Logo -->
       <div class="flex items-center space-x-6">
@@ -40,7 +40,10 @@
              class="absolute top-full left-0 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-auto hidden z-10">
         </div>
       </div>
-
+      <a href="/customer-orders" title="Đơn hàng của tôi" class="flex items-center gap-1 hover:opacity-80 transition">
+        <i class="fas fa-box text-white"></i>
+        <span>Đơn hàng</span>
+      </a>   
       <!-- Right: Cart / Admin / Logout -->
       <div class="flex items-center space-x-4">
         <a href="/cart"
