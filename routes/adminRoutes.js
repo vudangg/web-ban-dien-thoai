@@ -37,7 +37,6 @@ router.get('/users', async (req, res) => {
     }
   });
 // Quản lý đơn hàng
-
 router.get('/orders', async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -52,5 +51,21 @@ router.get('/admin/orders', async (req, res) => {
   const orders = await Order.find().populate('userId').sort({ createdAt: -1 });
   res.render('adminOrders', { orders });
 });
+// Cập nhật trạng thái đơn hàng
+router.post('/orders/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
 
+    if (!['pending', 'processing', 'completed', 'cancelled'].includes(status)) {
+      return res.status(400).send('Trạng thái không hợp lệ');
+    }
+
+    await Order.findByIdAndUpdate(id, { status });
+    res.redirect('/admin/orders');
+  } catch (err) {
+    console.error('❌ Lỗi cập nhật trạng thái đơn hàng:', err);
+    res.status(500).send('Lỗi server khi cập nhật trạng thái đơn hàng');
+  }
+});
 module.exports = router;

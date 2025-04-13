@@ -10,27 +10,31 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    
-    // Chuẩn hóa dữ liệu
+    let { username, password } = req.body;
     username = username.trim().toLowerCase();
 
-    // Tìm người dùng theo username
     const user = await User.findOne({ username });
     if (!user) {
         return res.send("Tài khoản không tồn tại. <a href='/login'>Thử lại</a>");
     }
 
-    // So sánh mật khẩu với mật khẩu đã mã hóa
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
         return res.send("Sai mật khẩu. <a href='/login'>Thử lại</a>");
     }
 
-    // Lưu session đăng nhập
-    req.session.user = { username: user.username, name: user.name };
+    // ✅ Lưu đầy đủ thông tin user vào session
+    req.session.user = {
+      _id: user._id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
     res.redirect('/');
 });
+
 
 
 router.get('/logout', (req, res) => {

@@ -34,13 +34,24 @@ const sendResetPasswordEmail = require("./mailService");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Session
+/// Session middleware
 app.use(session({
   secret: '12345',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: {
+    secure: false,
+    maxAge: 60 * 60 * 1000
+  }
 }));
+
+// ✅ Middleware expose session user (ĐÃ SỬA ĐÚNG)
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  req.user = req.session.user;
+  next();
+});
+
 
 // Body parsing
 app.use(cors());

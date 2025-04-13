@@ -7,15 +7,18 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+  <!-- Header -->
   <header class="bg-red-600 text-white p-6 shadow-md">
     <div class="container mx-auto flex justify-between items-center">
-      <!-- Thêm logo ở đây -->
-      <img src="/uploads/logo.png" alt="Logo" class="w-12 h-12 object-contain">
-      <h1 class="text-2xl font-bold ml-4">🛒 Quản lý đơn hàng</h1>
+      <div class="flex items-center gap-4">
+        <img src="/uploads/logo.png" alt="Logo" class="w-12 h-12 object-contain">
+        <h1 class="text-2xl font-bold">🛒 Quản lý đơn hàng</h1>
+      </div>
       <a href="/admin" class="bg-white text-red-600 px-4 py-2 rounded hover:bg-gray-100">← Về Dashboard</a>
     </div>
   </header>
 
+  <!-- Main content -->
   <main class="container mx-auto p-6 flex-grow">
     <% if (orders.length) { %>
       <table class="w-full bg-white rounded-lg shadow overflow-hidden">
@@ -34,8 +37,18 @@
               <td class="p-3"><%= o._id %></td>
               <td class="p-3"><%= o.userId %></td>
               <td class="p-3 text-red-600 font-semibold"><%= o.total.toLocaleString('vi-VN') %> VND</td>
-              <td class="p-3 capitalize"><%= o.status %></td>
-              <td class="p-3"><%= o.createdAt.toLocaleString() %></td>
+              <td class="p-3">
+                <form action="/admin/orders/<%= o._id %>/status" method="POST" class="flex items-center gap-2">
+                  <select name="status" class="border px-2 py-1 rounded text-sm capitalize">
+                    <option value="pending" <%= o.status === 'pending' ? 'selected' : '' %>>Chờ xử lý</option>
+                    <option value="processing" <%= o.status === 'processing' ? 'selected' : '' %>>Đang giao</option>
+                    <option value="completed" <%= o.status === 'completed' ? 'selected' : '' %>>Hoàn tất</option>
+                    <option value="cancelled" <%= o.status === 'cancelled' ? 'selected' : '' %>>Đã huỷ</option>
+                  </select>
+                  <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-600">Cập nhật</button>
+                </form>
+              </td>
+              <td class="p-3"><%= new Date(o.createdAt).toLocaleString() %></td>
             </tr>
           <% }) %>
         </tbody>
@@ -45,7 +58,7 @@
     <% } %>
   </main>
 
-  <!-- Footer đồng bộ -->
+  <!-- Footer -->
   <footer class="bg-gray-800 text-white py-6 mt-12">
     <div class="container mx-auto text-center text-sm">
       <p>&copy; <%= new Date().getFullYear() %> CellphoneS - Tất cả quyền được bảo lưu.</p>

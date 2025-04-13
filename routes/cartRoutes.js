@@ -82,36 +82,49 @@ router.post('/checkout', (req, res) => {
     paymentInfo: req.session.paymentInfo
   });
 });
-
 // Xử lý hoàn tất thanh toán (bước 3)
 router.post('/complete-checkout', async (req, res) => {
+  console.log('✅ [complete-checkout] SESSION:', req.session);
+
   const cart = req.session.cart || [];
   const user = req.session.user;
 
-  if (!user) return res.redirect('/login');
+  if (!user || !user.id) {
+    console.warn('❌ Không có session user');
+    return res.redirect('/login');
+  }
+
+
+  if (cart.length === 0) {
+    return res.redirect('/cart');
+  }
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const order = new Order({
-    userId: user._id,
-    items: cart.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      price: item.price
-    })),
-    total,
-    status: 'pending'
-  });
+  try {
+    const order = new Order({
+      userId: user.id, // ✅ đúng, vì bạn lưu là `id` trong session
+      items: cart.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      total,
+      status: 'pending'
+    });
 
-  await order.save();
+    await order.save();
 
-  req.session.cart = [];
-  req.session.paymentInfo = null;
+    req.session.cart = [];
+    req.session.paymentInfo = null;
 
-  res.render('checkoutSuccess', {
-    title: 'Thanh toán thành công',
-    finalMessage: 'Thanh toán thành công! Cảm ơn bạn đã mua hàng.'
-  });
+    res.render('checkoutSuccess', {
+      title: 'Thanh toán thành công',
+      finalMessage: 'Thanh toán thành công! Cảm ơn bạn đã mua hàng.'
+    });
+  } catch (err) {
+    console.error('❌ Lỗi khi lưu đơn hàng:', err);
+    res.status(500).send('Đã xảy ra lỗi khi hoàn tất thanh toán. Vui lòng thử lại.');
+  }
 });
-
 module.exports = router;
