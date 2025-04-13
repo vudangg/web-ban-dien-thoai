@@ -63,6 +63,9 @@
         <i class="fas fa-comments text-gray-600 hover:text-gray-800 cursor-pointer"></i>
         <img src="<%= user.avatar || '/uploads/avatar.png' %>" alt="User" class="w-8 h-8 rounded-full object-cover">
         <span class="text-gray-700"><%= user.name %></span>
+        <a href="/logout" class="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600 transition flex items-center">
+          <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
+        </a>
       </div>
     </header>
 

@@ -1,74 +1,118 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quản lý đơn hàng</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+  <% if (!user || user.role !== 'admin') { %>
+    <div class="text-center text-red-600 mt-10">
+      <h1 class="text-2xl font-bold">Bạn không có quyền truy cập vào trang này.</h1>
+      <a href="/login" class="text-blue-500 underline mt-4 block">Đăng nhập</a>
+    </div>
+  <% } else { %>
+
   <!-- Header -->
   <header class="bg-red-600 text-white p-6 shadow-md">
     <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-4">
-        <img src="/uploads/logo.png" alt="Logo" class="w-12 h-12 object-contain">
-        <h1 class="text-2xl font-bold">🛒 Quản lý đơn hàng</h1>
-      </div>
+      <h1 class="text-2xl font-bold">🛒 Quản lý đơn hàng</h1>
       <a href="/admin" class="bg-white text-red-600 px-4 py-2 rounded hover:bg-gray-100">← Về Dashboard</a>
     </div>
   </header>
 
   <!-- Main content -->
   <main class="container mx-auto p-6 flex-grow">
-    <% if (orders.length) { %>
-      <table class="w-full bg-white rounded-lg shadow overflow-hidden">
-        <thead class="bg-gray-200 text-left">
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="alert alert-danger text-red-600">
+        <%= errorMessage %>
+      </div>
+    <% } else if (orders.length === 0) { %>
+      <p class="text-center text-gray-600">Không có đơn hàng nào.</p>
+    <% } else { %>
+      <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead>
           <tr>
-            <th class="p-3">Mã đơn</th>
-            <th class="p-3">Khách hàng</th>
-            <th class="p-3">Tổng tiền</th>
-            <th class="p-3">Trạng thái</th>
-            <th class="p-3">Ngày tạo</th>
+            <th class="border border-gray-300 px-4 py-2">Mã đơn hàng</th>
+            <th class="border border-gray-300 px-4 py-2">Khách hàng</th>
+            <th class="border border-gray-300 px-4 py-2">Tổng tiền</th>
+            <th class="border border-gray-300 px-4 py-2">Trạng thái</th>
+            <th class="border border-gray-300 px-4 py-2">Hành động</th>
           </tr>
         </thead>
         <tbody>
-          <% orders.forEach(o => { %>
-            <tr class="border-t hover:bg-gray-50">
-              <td class="p-3"><%= o._id %></td>
-              <td class="p-3"><%= o.userId %></td>
-              <td class="p-3 text-red-600 font-semibold"><%= o.total.toLocaleString('vi-VN') %> VND</td>
-              <td class="p-3">
-                <form action="/admin/orders/<%= o._id %>/status" method="POST" class="flex items-center gap-2">
-                  <select name="status" class="border px-2 py-1 rounded text-sm capitalize">
-                    <option value="pending" <%= o.status === 'pending' ? 'selected' : '' %>>Chờ xử lý</option>
-                    <option value="processing" <%= o.status === 'processing' ? 'selected' : '' %>>Đang giao</option>
-                    <option value="completed" <%= o.status === 'completed' ? 'selected' : '' %>>Hoàn tất</option>
-                    <option value="cancelled" <%= o.status === 'cancelled' ? 'selected' : '' %>>Đã huỷ</option>
+          <% orders.forEach(order => { %>
+            <tr id="order-<%= order._id %>">
+              <td class="border border-gray-300 px-4 py-2"><%= order._id %></td>
+              <td class="border border-gray-300 px-4 py-2">
+                <p><strong>Tên:</strong> <%= order.customerName %></p>
+                <p><strong>Email:</strong> <%= order.customerEmail %></p>
+                <p><strong>SĐT:</strong> <%= order.customerPhone %></p>
+              </td>
+              <td class="border border-gray-300 px-4 py-2"><%= order.total %> VND</td>
+              <td class="border border-gray-300 px-4 py-2 status-text"><%= order.status %></td>
+              <td class="border border-gray-300 px-4 py-2">
+                <form data-order-id="<%= order._id %>" class="update-status-form flex items-center">
+                  <select name="status" class="border border-gray-300 rounded px-2 py-1">
+                    <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Chờ xử lý</option>
+                    <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Đang xử lý</option>
+                    <option value="Completed" <%= order.status === 'Completed' ? 'selected' : '' %>>Hoàn thành</option>
+                    <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Đã hủy</option>
                   </select>
-                  <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-600">Cập nhật</button>
+                  <button type="submit" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Cập nhật</button>
                 </form>
               </td>
-              <td class="p-3"><%= new Date(o.createdAt).toLocaleString() %></td>
             </tr>
           <% }) %>
         </tbody>
       </table>
-    <% } else { %>
-      <p class="text-center text-gray-500">Chưa có đơn hàng nào.</p>
     <% } %>
   </main>
+
+  <% } %>
 
   <!-- Footer -->
   <footer class="bg-gray-800 text-white py-6 mt-12">
     <div class="container mx-auto text-center text-sm">
-      <p>&copy; <%= new Date().getFullYear() %> CellphoneS - Tất cả quyền được bảo lưu.</p>
-      <nav class="mt-3 flex justify-center space-x-6 text-gray-300">
-        <a href="/privacy-policy" class="hover:underline hover:text-white transition">Chính sách bảo mật</a>
-        <a href="/terms" class="hover:underline hover:text-white transition">Điều khoản</a>
-        <a href="/contact" class="hover:underline hover:text-white transition">Liên hệ</a>
-      </nav>
+      © 2025 - Quản lý đơn hàng
     </div>
   </footer>
+
+  <!-- Script cập nhật trạng thái bằng AJAX -->
+  <script>
+    document.querySelectorAll('.update-status-form').forEach(form => {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const orderId = this.getAttribute('data-order-id');
+        const newStatus = this.querySelector('select[name="status"]').value;
+
+        try {
+          const res = await fetch(`/orders/${orderId}/update-status`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+          });
+
+          const result = await res.json();
+          if (res.ok) {
+            const row = document.getElementById(`order-${orderId}`);
+            const statusCell = row.querySelector('.status-text');
+            statusCell.textContent = newStatus;
+            alert('✅ Trạng thái đã được cập nhật.');
+          } else {
+            alert('❌ Lỗi: ' + result.message);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('❌ Có lỗi xảy ra khi cập nhật.');
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

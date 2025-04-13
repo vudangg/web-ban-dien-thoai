@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');           // Import model User
-const Customer = require('../models/Profile');    // Import model Profile (đặt tên là `Customer` trong code của bạn)
+const User = require('../models/User');           
+const Customer = require('../models/Profile');    
 
 // Route lấy thông tin profile của khách hàng
 router.get('/profile', (req, res) => {

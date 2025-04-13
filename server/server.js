@@ -6,14 +6,14 @@ const path = require("path");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
 const methodOverride = require('method-override');
-
+const cookieParser = require('cookie-parser');
 // Models
 const User = require("../models/User");
 const Admin = require("../models/Admin");
 const Profile = require("../models/Profile");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
-
+const Order = require('../models/Order');
 // Routes
 const authRoutes = require('../routes/authRoutes');
 const registerRoutes = require('../routes/registerRoutes');
@@ -23,15 +23,16 @@ const productRoutes = require("../routes/productRoutes");
 const categoryRoutes = require("../routes/categoryRoutes");
 const cartRoutes = require("../routes/cartRoutes");
 const profileRoutes = require('../routes/profileRoutes');
-
+const userRoutes = require('../routes/userRoutes');
 // Middleware
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
-
+const { isAuthenticated, isAdmin } = require('../middleware/auth');
 // Mail service
 const sendResetPasswordEmail = require("./mailService");
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
 /// Session middleware
@@ -58,14 +59,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-
-// Expose session user to views and req.user
-app.use((req, res, next) => {
-  res.locals.user = req.session.user;
-  req.user = req.session.user;
-  next();
-});
-
+app.use(cookieParser());
 // View engine & static
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../views"));
@@ -77,7 +71,7 @@ app.use('/auth', authRoutes);
 app.use('/register', registerRoutes);
 app.use('/admin', adminRoutes);
 app.use('/admin/categories', adminCategoryRoutes);
-
+app.use('/', userRoutes);
 // Login routes
 app.get('/login', (req, res) => res.render('login'));
 app.post('/login', async (req, res) => {
@@ -112,11 +106,15 @@ app.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
   const u = await User.findOne({ email });
   if (!u) return res.send("Email không tồn tại. <a href='/forgot-password'>Thử lại</a>");
-  try { 
-    await sendResetPasswordEmail(email, u._id); 
-    res.send("Đã gửi email đặt lại mật khẩu."); 
-  } catch { 
-    res.send("Lỗi gửi email. Vui lòng thử lại."); 
+  try {
+    const token = crypto.randomBytes(20).toString('hex');
+    u.resetToken = token;
+    u.tokenExpiry = Date.now() + 3600000; // 1 tiếng
+    await u.save();
+    await sendResetPasswordEmail(email, token); // ✅ gửi token, không gửi _id
+    res.send("Đã gửi email đặt lại mật khẩu.");
+  } catch {
+    res.send("Lỗi gửi email. Vui lòng thử lại.");
   }
 });
 app.get('/reset-password/:token', async (req, res) => {
@@ -145,7 +143,7 @@ app.post('/reset-password', async (req, res) => {
   u.password = await bcrypt.hash(password, 10);
   u.resetToken = u.tokenExpiry = undefined;
   await u.save();
-  res.send("Mật khẩu đã đặt lại. <a href='/login'>Đăng nhập</a>");
+  res.send("Mật khẩu đã đặt lại. <a href='/login'>Đăng nhập</a>");     
 });
 
 // Public APIs
@@ -265,7 +263,7 @@ app.use('/', profileRoutes);
 async function seedInitialData() {
   const categoryCount = await Category.countDocuments();
   if (categoryCount === 0) {
-    const defaultCategories = ["Điện thoại", "Laptop", "Phụ kiện", "Thời trang"];
+    const defaultCategories = ["Điện thoại", "Laptop", "Phụ kiện"];
     await Category.insertMany(defaultCategories.map(name => ({ name })));
     console.log('✅ Đã seed các danh mục mặc định');
   }
@@ -316,6 +314,42 @@ app.get('/api/dashboard-data', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
+  }
+});
+// Route dành cho admin: Lấy tất cả đơn hàng
+app.get('/admin/orders', isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const orders = await Order.find().populate('userId').populate('items.productId');
+    res.render('orders', { orders });
+  } catch (error) {
+    console.error("Lỗi khi lấy đơn hàng của admin:", error);
+    res.status(500).render('orders', {
+      orders: [],
+      errorMessage: 'Đã xảy ra lỗi khi tải đơn hàng.'
+    });
+  }
+});
+
+// Route dành cho khách hàng: Lấy đơn hàng của chính user đó
+app.get('/customerOrders', isAuthenticated, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user._id }).populate('items.productId');
+    res.render('customerOrders', { user: req.user, orders });
+  } catch (error) {
+    console.error("Lỗi khi lấy đơn hàng của khách hàng:", error);
+    res.status(500).send('Lỗi khi lấy danh sách đơn hàng.');
+  }
+});
+
+
+app.post('/orders/:id/update-status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    await Order.findByIdAndUpdate(id, { status });
+    res.json({ message: 'Cập nhật thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi khi cập nhật đơn hàng' });
   }
 });
 // ——————————————————————————

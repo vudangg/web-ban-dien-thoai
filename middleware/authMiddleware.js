@@ -1,6 +1,11 @@
+
 module.exports = (req, res, next) => {
     if (!req.session.user) {
-        return res.redirect('/login'); // Nếu chưa đăng nhập, chuyển hướng về trang login
+      return res.redirect('/login');
     }
-    next(); // Tiến hành tiếp tục xử lý nếu đã đăng nhập
-};
+    // Gán thông tin user từ session cho req.user để sử dụng cho các truy vấn sau này
+    req.user = req.session.user;
+    res.locals.user = req.session.user;
+    next();
+  };
+  
