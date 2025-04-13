@@ -65,7 +65,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use('/auth', authRoutes);
 app.use('/register', registerRoutes);
 app.use('/admin', adminRoutes);
-app.use('/admin', adminCategoryRoutes);
+app.use('/admin/categories', adminCategoryRoutes);
 
 // Login routes
 app.get('/login', (req, res) => res.render('login'));
@@ -86,7 +86,7 @@ app.post('/login', async (req, res) => {
     name: user.name || 'Admin',
     role: user.role || 'admin'
   };
-
+  if (req.session.user.role === 'admin') return res.redirect('/admin');
   switch (req.session.user.role) {
     case 'admin': return res.redirect('/admin');
     case 'moderator': return res.redirect('/moderator');
@@ -172,10 +172,27 @@ app.post('/profile', async (req, res) => {
 
 // Home
 app.get('/', async (req, res) => {
-  let products = await Product.find().sort({ _id: -1 }).limit(6);
-  while (products.length < 6) products.push({ image: '/uploads/default.png', name: 'Sản phẩm mẫu', price: 0, _id: '#' });
-  res.render('index', { products, user: req.session.user, cart: req.session.cart || [] });
+  // Sản phẩm hot sale
+  const hotSaleProducts = await Product.find({ hotSale: true }).limit(6);
+
+  // Các sản phẩm khác (ví dụ mới nhất)
+  const otherProducts = await Product.find({ hotSale: false })
+    .sort({ _id: -1 })
+    .limit(12);
+
+  // Thời gian kết thúc khuyến mãi
+  const hotSaleEndTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
+
+  res.render('index', {
+    hotSaleProducts,
+    otherProducts,
+    hotSaleEndTime: hotSaleEndTime.toISOString(),
+    user: req.session.user,
+    cart: req.session.cart || []
+  });
 });
+
+
 
 // Cart
 app.post('/cart/add', (req, res) => {

@@ -7,14 +7,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-blue-500 text-white p-4 text-center">
-        <h1 class="text-2xl font-bold">Giỏ hàng</h1>
-        <nav class="mt-2 space-x-4">
+    <header class="bg-red-600 text-white flex items-center justify-between px-6 py-2">
+        <!-- Logo và tên trang -->
+        <div class="flex items-center space-x-2">
+            <img src="/uploads/logo.png" alt="Logo" class="h-12 w-auto object-contain">
+            <span class="text-xl font-bold">cellphoneS</span>
+        </div>
+    
+        <!-- Các liên kết -->
+        <nav class="flex items-center space-x-6">
             <a href="/" class="hover:underline">Trang chủ</a>
+            <% if (user && (user.role === 'admin' || user.role === 'moderator')) { %>
             <a href="/products" class="hover:underline">Sản phẩm</a>
-            <a href="/cart" class="hover:underline">Giỏ hàng</a>
+            <% } %>    
+            <!-- Tên người dùng -->
+            <div class="bg-red-400 px-3 py-1 rounded-lg flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5.121 17.804A7.963 7.963 0 0112 15c1.657 0 3.183.507 4.436 1.361M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span><%= user.name %></span>
+            </div>
+    
+            <a href="/logout" class="hover:underline">Đăng xuất</a>
         </nav>
-    </header>
+    </header>      
     <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
         <h2 class="text-xl font-semibold mb-4">Danh sách sản phẩm trong giỏ hàng</h2>
         <% if (cart && cart.length > 0) { %>

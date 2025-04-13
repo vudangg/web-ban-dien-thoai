@@ -13,7 +13,7 @@
   <header class="bg-red-600 text-white px-6 py-3 flex items-center justify-between">
     <!-- Logo -->
     <div class="flex items-center gap-2">
-      <img src="/images/logo.png" alt="Logo" class="w-6 h-6" />
+      <img src="/uploads/logo.png" alt="Logo" class="h-16 w-auto" />
       <span class="font-bold text-lg">cellphoneS</span>
     </div>
 
@@ -36,7 +36,7 @@
 
       <!-- Nút Admin -->
       <% if (user && user.role === 'admin') { %>
-        <a href="/admin/dashboard" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded">
+        <a href="/admin" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded">
           <i class="fas fa-user-shield mr-1"></i> Admin
         </a>
       <% } %>
@@ -74,6 +74,7 @@
             </a>
 
             <!-- Form thêm vào giỏ hàng -->
+            <% if (user && user.role === 'admin') { %>
             <form action="/cart/add" method="POST" class="mt-4">
               <input type="hidden" name="productId" value="<%= product._id %>">
               <input type="hidden" name="name" value="<%= product.name %>">
@@ -82,7 +83,7 @@
                 🛒 Thêm vào giỏ hàng
               </button>
             </form>
-
+            <% } %>
             <% if (user && user.role === 'admin') { %>
               <div class="mt-4 flex justify-between">
                 <button 

@@ -1,44 +1,65 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-blue-500 text-white p-4 text-center">
-        <h1 class="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
-    </header>
-    <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
-        <form action="/products/edit/<%= product._id %>" method="POST">
-            <label class="block text-gray-700">Tên sản phẩm:</label>
-            <input type="text" name="name" value="<%= product.name %>" required class="w-full p-2 border rounded-lg mb-4">
+  <header class="bg-blue-500 text-white p-4 text-center">
+    <h1 class="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
+  </header>
 
-            <label class="block text-gray-700">Giá:</label>
-            <input type="number" name="price" value="<%= product.price %>" required class="w-full p-2 border rounded-lg mb-4">
+  <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+    <form action="/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+      <!-- Tên sản phẩm -->
+      <label class="block text-gray-700">Tên sản phẩm:</label>
+      <input type="text" name="name" value="<%= product.name %>" required class="w-full p-2 border rounded-lg mb-4">
 
-            <label class="block text-gray-700">Mô tả:</label>
-            <textarea name="description" class="w-full p-2 border rounded-lg mb-4"><%= product.description %></textarea>
+      <!-- Giá -->
+      <label class="block text-gray-700">Giá:</label>
+      <input type="number" name="price" value="<%= product.price %>" required class="w-full p-2 border rounded-lg mb-4">
 
-            <label class="block text-gray-700">Danh mục:</label>
-            <select name="category" class="w-full p-2 border rounded-lg mb-4">
-             <% categories.forEach(category => { %>
-             <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? "selected" : "" %>>
-              <%= category.name %>
-              </option>
-              <% }); %>
-            </select>
-            <label>Ảnh hiện tại:</label>
-            <% if (product.image) { %>
-            <img src="<%= product.image %>" alt="Ảnh sản phẩm" width="150">
-            <% } %>
+      <!-- Mô tả -->
+      <label class="block text-gray-700">Mô tả:</label>
+      <textarea name="description" class="w-full p-2 border rounded-lg mb-4"><%= product.description %></textarea>
 
-           <label>Chọn ảnh mới:</label>
-           <input type="file" name="image" accept="image/*">
+      <!-- Danh mục -->
+      <label class="block text-gray-700">Danh mục:</label>
+      <select name="category" class="w-full p-2 border rounded-lg mb-4">
+        <% categories.forEach(category => { %>
+          <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? "selected" : "" %>>
+            <%= category.name %>
+          </option>
+        <% }); %>
+      </select>
 
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Lưu</button>
-        </form>
-    </main>
+      <!-- Checkbox Hot Sale -->
+      <label class="inline-flex items-center mb-4">
+        <input type="checkbox" name="hotSale" class="form-checkbox"
+          <% if (product.hotSale) { %> checked <% } %> 
+        >
+        <span class="ml-2 text-gray-700">Hot Sale</span>
+      </label>
+
+      <!-- Ảnh hiện tại -->
+      <div class="mb-4">
+        <label class="block text-gray-700">Ảnh hiện tại:</label>
+        <% if (product.image) { %>
+          <img src="<%= product.image %>" alt="Ảnh sản phẩm" width="150" class="rounded shadow mt-2">
+        <% } else { %>
+          <p class="text-gray-500 italic">Chưa có ảnh</p>
+        <% } %>
+      </div>
+
+      <!-- Chọn ảnh mới -->
+      <label class="block text-gray-700">Chọn ảnh mới:</label>
+      <input type="file" name="image" accept="image/*" class="mb-4">
+
+      <!-- Nút lưu -->
+      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Lưu</button>
+    </form>
+  </main>
 </body>
 </html>

@@ -75,28 +75,46 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Hiển thị form thêm sản phẩm (đặt trước route có :id)
 router.get("/create", isAdmin, async (req, res) => {
     try {
         const categories = await Category.find();
-        res.render("createProduct", { title: "Thêm sản phẩm mới", categories });
+        res.render("createProduct", {
+            title: "Thêm sản phẩm mới",
+            categories,
+            product: {} // ✅ thêm dòng này để tránh lỗi EJS khi check product.hotSale
+        });
     } catch (error) {
         console.error("❌ Lỗi lấy danh mục:", error);
         res.status(500).send("Lỗi lấy danh mục");
     }
 });
 
-// Xử lý thêm sản phẩm
-router.post("/create", isAdmin,upload.single("image"), async (req, res) => {
+
+router.post("/create", isAdmin, upload.single("image"), async (req, res) => {
     try {
         const { name, price, description, category } = req.body;
+        const hotSale = !!req.body.hotSale; // ✅ thêm dòng này để lấy checkbox
+
+        // Kiểm tra dữ liệu bắt buộc
         if (!name || !price || !description || !category) {
             return res.status(400).send("❌ Vui lòng nhập đầy đủ thông tin.");
         }
+
         const categoryExists = await Category.findById(category);
         if (!categoryExists) return res.status(400).send("❌ Danh mục không hợp lệ");
+
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
-        const newProduct = new Product({ name, price, description, category, image: imageUrl });
+
+        // ✅ Gộp tất cả lại 1 lần tạo sản phẩm
+        const newProduct = new Product({
+            name,
+            price,
+            description,
+            category,
+            image: imageUrl,
+            hotSale // <-- ✅ gán giá trị hotSale vào đây
+        });
+
         await newProduct.save();
         res.redirect("/products");
     } catch (error) {
@@ -163,8 +181,8 @@ router.post("/edit/:id", isAdmin,upload.single("image"), async (req, res) => {
         if (!categoryExists) return res.status(400).send("❌ Danh mục không hợp lệ");
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).send("❌ Không tìm thấy sản phẩm");
-
-        let updateData = { name, price, description, category };
+        const hotSale = !!req.body.hotSale;
+        let updateData = { name, price, description, category, hotSale }; // ✅
         if (req.file) {
             // Xóa ảnh cũ nếu có
             if (product.image) {

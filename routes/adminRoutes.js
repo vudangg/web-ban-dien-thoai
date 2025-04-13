@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Admin = require('../models/Admin'); // model Admin
-const bcrypt = require('bcrypt'); // hoặc bcryptjs nếu bạn dùng thư viện đó
-
+const bcrypt = require('bcryptjs'); 
 // Hiển thị form đăng ký
 router.get('/register', (req, res) => {
     res.render('adminRegister', { title: 'Đăng ký Admin' });
 });
-
 // Xử lý đăng ký admin
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
@@ -26,5 +24,4 @@ router.post('/register', async (req, res) => {
         res.status(500).send('Lỗi server.');
     }
 });
-
 module.exports = router;

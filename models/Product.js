@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
     image: { type: String, default: "" },
     createdAt: { type: Date, default: Date.now },
+    hotSale: { type: Boolean, default: false },
 });
 
 const Product = mongoose.model("Product", productSchema);

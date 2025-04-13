@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -14,24 +14,32 @@
       <a href="/products" class="hover:underline">Sản phẩm</a>
     </nav>
   </header>
+
   <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
     <form action="/products/create" method="POST" enctype="multipart/form-data">
-      <div>
+      <!-- Tên sản phẩm -->
+      <div class="mb-4">
         <label class="block text-gray-700">Tên sản phẩm</label>
         <input type="text" name="name" required class="w-full p-2 border rounded-lg">
       </div>
-      <div>
+
+      <!-- Giá sản phẩm -->
+      <div class="mb-4">
         <label class="block text-gray-700">Giá</label>
-        <!-- Input hiển thị đã định dạng -->
+        <!-- Hiển thị đã định dạng -->
         <input type="text" id="priceDisplay" required class="w-full p-2 border rounded-lg" placeholder="Nhập giá sản phẩm">
-        <!-- Input ẩn chứa giá trị gốc (không định dạng) -->
+        <!-- Input ẩn -->
         <input type="hidden" id="price" name="price">
       </div>
-      <div>
+
+      <!-- Mô tả -->
+      <div class="mb-4">
         <label class="block text-gray-700">Mô tả</label>
         <textarea name="description" required class="w-full p-2 border rounded-lg"></textarea>
       </div>
-      <div>
+
+      <!-- Danh mục -->
+      <div class="mb-4">
         <label class="block text-gray-700">Danh mục</label>
         <select name="category" required class="w-full p-2 border rounded-lg">
           <% if (categories.length > 0) { %>
@@ -43,45 +51,50 @@
           <% } %>
         </select>
       </div>
-      <div>
+
+      <!-- Hình ảnh -->
+      <div class="mb-4">
         <label class="block text-gray-700">Hình ảnh</label>
         <input type="file" name="image" accept="image/*" required class="w-full p-2 border rounded-lg">
-      </div>            
-      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+      </div>
+
+      <!-- Hot Sale -->
+      <div class="mb-6">
+        <label class="inline-flex items-center">
+          <input type="checkbox" name="hotSale" class="form-checkbox">
+          <span class="ml-2 text-gray-700">Hot Sale</span>
+        </label>
+      </div>
+
+      <!-- Nút gửi -->
+      <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
         Thêm sản phẩm
       </button>
     </form>
   </main>
-  
+
+  <!-- Script định dạng giá -->
   <script>
     const priceDisplay = document.getElementById('priceDisplay');
     const priceHidden = document.getElementById('price');
 
-    // Hàm định dạng số với dấu chấm phân cách hàng nghìn (ví dụ: "10000" -> "10.000.000")
     function formatPrice(value) {
-      // Lấy giá trị dạng số (loại bỏ các ký tự không phải số)
       const numericValue = value.replace(/\D/g, '');
-      return Number(numericValue).toLocaleString('de-DE'); // sử dụng định dạng của Đức (mà ở đây dấu chấm được dùng làm phân cách hàng nghìn)
+      return Number(numericValue).toLocaleString('de-DE');
     }
 
-    // Cập nhật định dạng khi nhập
     priceDisplay.addEventListener('input', (e) => {
-      // Lấy giá trị gốc (không định dạng) bằng cách loại bỏ các dấu chấm
       const rawValue = e.target.value.replace(/\./g, '').replace(/\D/g, '');
       if (rawValue) {
-        // Định dạng giá trị và cập nhật giao diện input hiển thị
         const formattedValue = Number(rawValue).toLocaleString('de-DE');
         priceDisplay.value = formattedValue;
-        // Cập nhật input ẩn với giá trị không định dạng
         priceHidden.value = rawValue;
       } else {
         priceHidden.value = '';
       }
     });
 
-    // Trước khi submit, đảm bảo input ẩn có giá trị dạng số
-    const form = document.querySelector('form');
-    form.addEventListener('submit', (e) => {
+    document.querySelector('form').addEventListener('submit', (e) => {
       priceHidden.value = priceDisplay.value.replace(/\./g, '');
     });
   </script>
