@@ -48,6 +48,9 @@ router.get('/orders', async (req, res) => {
     res.status(500).send(`Lỗi server: ${err.message}`);
   }
 });
-
+router.get('/admin/orders', async (req, res) => {
+  const orders = await Order.find().populate('userId').sort({ createdAt: -1 });
+  res.render('adminOrders', { orders });
+});
 
 module.exports = router;
