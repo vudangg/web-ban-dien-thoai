@@ -6,7 +6,7 @@
     <title>Giỏ hàng</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <header class="bg-red-600 text-white flex items-center justify-between px-6 py-2">
         <!-- Logo và tên trang -->
         <div class="flex items-center space-x-2">
@@ -33,7 +33,8 @@
             <a href="/logout" class="hover:underline">Đăng xuất</a>
         </nav>
     </header>      
-    <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+
+    <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg flex-1">
         <h2 class="text-xl font-semibold mb-4">Danh sách sản phẩm trong giỏ hàng</h2>
         <% if (cart && cart.length > 0) { %>
             <ul class="space-y-4">
@@ -72,5 +73,16 @@
             <p class="text-center text-gray-500">Giỏ hàng của bạn đang trống.</p>
         <% } %>
     </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto text-center">
+          <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+          <nav class="mt-4 space-x-6">
+            <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+            <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+            <a href="/contact" class="hover:underline">Liên hệ</a>
+          </nav>
+        </div>
+    </footer>
 </body>
 </html>

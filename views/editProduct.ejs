@@ -2,64 +2,106 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-  <header class="bg-blue-500 text-white p-4 text-center">
-    <h1 class="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white p-6 shadow-md">
+    <div class="container mx-auto text-center">
+      <h1 class="text-2xl font-bold">✏️ Chỉnh sửa sản phẩm</h1>
+    </div>
   </header>
 
-  <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
-    <form action="/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
-      <!-- Tên sản phẩm -->
-      <label class="block text-gray-700">Tên sản phẩm:</label>
-      <input type="text" name="name" value="<%= product.name %>" required class="w-full p-2 border rounded-lg mb-4">
+  <!-- Form chỉnh sửa sản phẩm -->
+  <main class="flex-grow container mx-auto mt-10 px-6">
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-2xl mx-auto">
 
-      <!-- Giá -->
-      <label class="block text-gray-700">Giá:</label>
-      <input type="number" name="price" value="<%= product.price %>" required class="w-full p-2 border rounded-lg mb-4">
+      <form action="/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data" class="space-y-6">
 
-      <!-- Mô tả -->
-      <label class="block text-gray-700">Mô tả:</label>
-      <textarea name="description" class="w-full p-2 border rounded-lg mb-4"><%= product.description %></textarea>
+        <!-- Tên sản phẩm -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Tên sản phẩm</label>
+          <input type="text" name="name" value="<%= product.name %>" required
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+        </div>
 
-      <!-- Danh mục -->
-      <label class="block text-gray-700">Danh mục:</label>
-      <select name="category" class="w-full p-2 border rounded-lg mb-4">
-        <% categories.forEach(category => { %>
-          <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? "selected" : "" %>>
-            <%= category.name %>
-          </option>
-        <% }); %>
-      </select>
+        <!-- Giá -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Giá (VNĐ)</label>
+          <input type="number" name="price" value="<%= product.price %>" required
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+        </div>
 
-      <!-- Checkbox Hot Sale -->
-      <label class="inline-flex items-center mb-4">
-        <input type="checkbox" name="hotSale" class="form-checkbox"
-          <% if (product.hotSale) { %> checked <% } %> 
-        >
-        <span class="ml-2 text-gray-700">Hot Sale</span>
-      </label>
+        <!-- Mô tả -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Mô tả</label>
+          <textarea name="description" rows="4" required
+                    class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-400"><%= product.description %></textarea>
+        </div>
 
-      <!-- Ảnh hiện tại -->
-      <div class="mb-4">
-        <label class="block text-gray-700">Ảnh hiện tại:</label>
-        <% if (product.image) { %>
-          <img src="<%= product.image %>" alt="Ảnh sản phẩm" width="150" class="rounded shadow mt-2">
-        <% } else { %>
-          <p class="text-gray-500 italic">Chưa có ảnh</p>
-        <% } %>
-      </div>
+        <!-- Danh mục -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Danh mục</label>
+          <select name="category"
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+            <% categories.forEach(category => { %>
+              <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? "selected" : "" %>>
+                <%= category.name %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
 
-      <!-- Chọn ảnh mới -->
-      <label class="block text-gray-700">Chọn ảnh mới:</label>
-      <input type="file" name="image" accept="image/*" class="mb-4">
+        <!-- Hot Sale -->
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" name="hotSale" class="form-checkbox text-red-500"
+            <% if (product.hotSale) { %> checked <% } %> >
+          <span class="text-gray-700 font-medium">Gắn nhãn Hot Sale 🔥</span>
+        </div>
 
-      <!-- Nút lưu -->
-      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Lưu</button>
-    </form>
+        <!-- Ảnh hiện tại -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Ảnh hiện tại</label>
+          <% if (product.image) { %>
+            <img src="<%= product.image %>" alt="Ảnh sản phẩm" class="w-40 h-40 object-cover rounded shadow-md mt-2">
+          <% } else { %>
+            <p class="text-gray-500 italic">Chưa có ảnh</p>
+          <% } %>
+        </div>
+
+        <!-- Chọn ảnh mới -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Chọn ảnh mới (nếu muốn thay đổi)</label>
+          <input type="file" name="image" accept="image/*"
+                 class="w-full p-2 border border-gray-300 rounded-lg bg-white file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0 file:text-sm file:font-semibold
+                        file:bg-red-500 file:text-white hover:file:bg-red-600">
+        </div>
+
+        <!-- Nút lưu -->
+        <div class="text-right">
+          <button type="submit"
+                  class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
+            💾 Lưu thay đổi
+          </button>
+        </div>
+
+      </form>
+
+    </div>
   </main>
+  <footer class="bg-gray-800 text-white py-6 mt-12">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 space-x-6">
+        <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>

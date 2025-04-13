@@ -5,145 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
   <!-- Header -->
-  <header class="bg-red-600 text-white px-6 py-3 flex items-center justify-between">
-    <!-- Logo -->
-    <div class="flex items-center gap-2">
-      <img src="/uploads/logo.png" alt="Logo" class="h-16 w-auto" />
-      <span class="font-bold text-lg">cellphoneS</span>
-    </div>
-
-    <!-- Thanh tìm kiếm -->
-    <form action="/search" method="GET" class="flex-1 mx-6">
-      <input
-        type="text"
-        name="keyword"
-        placeholder="Bạn cần tìm gì?"
-        class="w-full px-4 py-2 rounded focus:outline-none text-black"
-      />
-    </form>
-
-    <!-- Các nút bên phải -->
-    <div class="flex items-center gap-4">
-      <!-- Giỏ hàng -->
-      <a href="/cart" class="flex items-center hover:text-yellow-300 transition duration-200">
-        <i class="fas fa-shopping-cart mr-1"></i> Giỏ hàng
-      </a>
-
-      <!-- Nút Admin -->
-      <% if (user && user.role === 'admin') { %>
-        <a href="/admin" class="bg-red-500 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded">
-          <i class="fas fa-user-shield mr-1"></i> Admin
+  <header class="bg-red-600 text-white">
+    <div class="container mx-auto flex items-center justify-between px-6 py-3">
+      <!-- Left: Home + Logo -->
+      <div class="flex items-center space-x-6">
+        <a href="/" class="flex items-center text-white hover:text-gray-200">
+          <i class="fas fa-home mr-2"></i>
+          <span class="font-medium">Trang chủ</span>
         </a>
-      <% } %>
+        <div class="flex items-center gap-2">
+          <img src="/uploads/logo.png" alt="Logo" class="h-12 w-auto" />
+          <span class="font-bold text-xl">cellphoneS</span>
+        </div>
+      </div>
 
-      <!-- Nút đăng xuất -->
-      <a href="/logout" class="hover:text-yellow-300 transition duration-200">
-        Đăng xuất
-      </a>
+      <!-- Search -->
+      <div class="relative flex-1 max-w-md mx-6">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <i class="fas fa-search"></i>
+        </span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Bạn cần tìm gì?"
+          class="w-full pl-10 pr-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        />
+        <div id="searchResults"
+             class="absolute top-full left-0 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-auto hidden z-10">
+        </div>
+      </div>
+
+      <!-- Right: Cart / Admin / Logout -->
+      <div class="flex items-center space-x-4">
+        <a href="/cart"
+           class="flex items-center px-3 py-2 hover:bg-red-500 rounded-lg transition">
+          <i class="fas fa-shopping-cart mr-1"></i>
+          <span>Giỏ hàng</span>
+        </a>
+        <% if (user && user.role === 'admin') { %>
+          <a href="/admin"
+             class="flex items-center bg-yellow-400 text-red-600 font-semibold px-3 py-2 rounded-lg hover:bg-yellow-300 transition">
+            <i class="fas fa-user-shield mr-1"></i>
+            <span>Admin</span>
+          </a>
+        <% } %>
+        <a href="/logout"
+           class="px-3 py-2 hover:bg-red-500 rounded-lg transition">
+          Đăng xuất
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- Danh sách sản phẩm -->
-  <main class="container mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-    <h2 class="text-xl font-semibold mb-6 text-gray-800">
-      📦 Danh sách sản phẩm <%= typeof category !== 'undefined' && category ? `- ${category}` : "" %>
+  <!-- Main Content -->
+  <main class="container mx-auto flex-1 mt-8 px-6">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">
+      📦 Danh sách sản phẩm
+      <% if (typeof category !== 'undefined' && category) { %>
+        <span class="text-red-600">- <%= category %></span>
+      <% } %>
     </h2>
-
-    <!-- Kiểm tra nếu có sản phẩm -->
+  
     <% if (products && products.length > 0) { %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <% products.forEach(product => { %>
-          <div id="product-<%= product._id %>" class="border p-6 rounded-lg shadow-lg bg-white hover:shadow-2xl transition-transform transform hover:scale-105">
-            <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-56 object-cover rounded-lg mb-4">
-
-            <h2 class="text-lg font-semibold text-gray-900"><%= product.name %></h2>
-            <p class="text-gray-600 mt-2">
-              <strong class="font-semibold text-gray-700">Giá:</strong>
-              <span class="text-red-600 font-bold">
+          <div id="product-<%= product._id %>" class="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition duration-300">
+            <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover" />
+            <div class="p-4 space-y-2">
+              <h3 class="text-lg font-bold text-gray-900 truncate"><%= product.name %></h3>
+              <p class="text-red-600 font-semibold text-lg">
                 <%= Number(product.price).toLocaleString('vi-VN') %> VND
-              </span>
-            </p>
-
-            <a href="/products/<%= product._id %>" class="block mt-2 text-blue-500 hover:underline">
-              Xem chi tiết
-            </a>
-
-            <!-- Form thêm vào giỏ hàng -->
-            <% if (user && user.role === 'admin') { %>
-            <form action="/cart/add" method="POST" class="mt-4">
-              <input type="hidden" name="productId" value="<%= product._id %>">
-              <input type="hidden" name="name" value="<%= product.name %>">
-              <input type="hidden" name="price" value="<%= product.price %>">
-              <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">
-                🛒 Thêm vào giỏ hàng
-              </button>
-            </form>
-            <% } %>
-            <% if (user && user.role === 'admin') { %>
-              <div class="mt-4 flex justify-between">
-                <button 
-                  type="button"
-                  class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm"
-                  onclick="deleteProduct('<%= product._id %>');">
-                  🗑️ Xoá
-                </button>
-                <a href="/products/edit/<%= product._id %>" class="text-yellow-500 hover:underline">
-                  ✏️ Chỉnh sửa
-                </a>
-              </div>
-            <% } %>
+              </p>
+              <a href="/products/<%= product._id %>" class="block text-center bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                Xem chi tiết
+              </a>
+  
+              <% if (user && user.role === 'admin') { %>
+                <div class="flex justify-between items-center mt-3">
+                  <a href="/products/edit/<%= product._id %>" class="text-yellow-500 hover:underline text-sm">✏️ Chỉnh sửa</a>
+                  <button onclick="deleteProduct('<%= product._id %>')" class="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg transition">
+                    🗑️ Xóa
+                  </button>
+                </div>
+              <% } %>
+            </div>
           </div>
-        <% }); %>
+        <% }) %>
       </div>
     <% } else { %>
-      <p class="text-gray-500 text-center">
-        ⛔ Chưa có sản phẩm nào. <a href="/products/create" class="text-blue-500 underline">Thêm sản phẩm ngay</a>!
+      <p class="text-center text-gray-500 py-20">
+        ⛔ Chưa có sản phẩm nào.
+        <a href="/products/create" class="text-blue-500 underline">Thêm sản phẩm ngay</a>!
       </p>
     <% } %>
-
-    <!-- Nút thêm sản phẩm & về dashboard -->
+  
     <% if (user && user.role === 'admin') { %>
-      <div class="flex justify-end mt-8 space-x-4">
-        <a href="/products/create" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">
-          ➕ Thêm sản phẩm
-        </a>
-        <a href="/admin" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition duration-200">
-          ← Quay về Dashboard
-        </a>
+      <div class="flex justify-end mt-8 gap-4">
+        <a href="/products/create" class="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition">➕ Thêm sản phẩm</a>
+        <a href="/admin" class="bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-gray-900 transition">← Quay về Dashboard</a>
       </div>
     <% } %>
-  </main>
+  </main>  
 
-  <!-- Script xử lý xóa sản phẩm -->
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 space-x-6">
+        <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Delete script & Search JS -->
   <script>
     function deleteProduct(productId) {
-      if (confirm("Bạn có chắc chắn muốn xoá sản phẩm này?")) {
-        fetch(`/products/delete/${productId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .then(response => response.json())
+      if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+      fetch(`/products/delete/${productId}`, { method: 'DELETE' })
+        .then(res => res.json())
         .then(data => {
-          if (data.message) {
-            alert(data.message);
-            document.getElementById(`product-${productId}`).remove();
-          } else {
-            alert("Có lỗi xảy ra khi xóa sản phẩm.");
-          }
+          alert(data.message || 'Xóa thành công');
+          document.getElementById(`product-${productId}`)?.remove();
         })
-        .catch(error => {
-          console.error('Lỗi:', error);
-          alert("Lỗi khi xóa sản phẩm.");
-        });
-      }
+        .catch(() => alert("Lỗi khi xóa sản phẩm."));
     }
+
+    const input = document.getElementById('searchInput');
+    const results = document.getElementById('searchResults');
+    let timer;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      const q = input.value.trim();
+      if (!q) return results.classList.add('hidden');
+      timer = setTimeout(() => {
+        fetch(`/api/search?q=${encodeURIComponent(q)}`)
+          .then(r => r.json())
+          .then(list => {
+            if (!list.length) {
+              results.innerHTML = '<div class="p-3 text-gray-500">Không tìm thấy sản phẩm</div>';
+            } else {
+              results.innerHTML = list.map(p => `
+                <a href="/products/${p._id}"
+                   class="flex items-center gap-3 p-3 hover:bg-gray-100 transition">
+                  <img src="${p.image}" alt="${p.name}"
+                       class="w-12 h-12 object-contain rounded" />
+                  <div>
+                    <div class="font-medium">${p.name}</div>
+                    <div class="text-red-600">${Number(p.price).toLocaleString('vi-VN')} VND</div>
+                  </div>
+                </a>
+              `).join('');
+            }
+            results.classList.remove('hidden');
+          });
+      }, 300);
+    });
+    document.addEventListener('click', e => {
+      if (!input.contains(e.target) && !results.contains(e.target)) {
+        results.classList.add('hidden');
+      }
+    });
   </script>
 </body>
 </html>

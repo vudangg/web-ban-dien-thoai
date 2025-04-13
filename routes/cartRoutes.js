@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-
+const Product = require('../models/Product');
 // Hiển thị giỏ hàng
 router.get('/cart', (req, res) => {
     const cart = req.session.cart || [];
@@ -10,49 +10,36 @@ router.get('/cart', (req, res) => {
 });
 
 // Xử lý thêm sản phẩm vào giỏ hàng
-router.post('/cart/add', (req, res) => {
-    const { productId, name, price, image } = req.body;
-
-    // Kiểm tra xem giá có hợp lệ không
-    if (!price) {
-        return res.status(400).send('Giá sản phẩm không tồn tại hoặc không hợp lệ');
-    }
-
-    console.log("Price received:", price);
-
-    // Đảm bảo rằng price là chuỗi trước khi xử lý
-    const priceStr = price.toString();
-    // Loại bỏ các dấu chấm phân cách (nếu có) trước khi chuyển đổi
-    const sanitizedPrice = priceStr.replace(/\./g, '');
-    const parsedPrice = parseFloat(sanitizedPrice);
-
-    if (isNaN(parsedPrice)) {
-        return res.status(400).send('Giá sản phẩm không hợp lệ');
-    }
-
-    // Nếu giỏ hàng chưa được khởi tạo, khởi tạo giỏ hàng
-    if (!req.session.cart) {
-        req.session.cart = [];
-    }
-
-    // Kiểm tra nếu sản phẩm đã tồn tại trong giỏ hàng
-    let cartItem = req.session.cart.find(item => item.productId == productId);
-    if (cartItem) {
-        // Nếu sản phẩm đã có, tăng số lượng lên 1
-        cartItem.quantity += 1;
-    } else {
-        // Nếu chưa có, thêm mới sản phẩm vào giỏ hàng
+router.post('/cart/add', async (req, res) => {
+    try {
+      const { productId } = req.body;
+  
+      // ✅ Lấy sản phẩm từ database
+      const product = await Product.findById(productId);
+      if (!product) return res.status(404).send('Không tìm thấy sản phẩm');
+  
+      if (!req.session.cart) req.session.cart = [];
+  
+      const exist = req.session.cart.find(p => p.productId === productId);
+      if (exist) {
+        exist.quantity++;
+      } else {
         req.session.cart.push({
-            productId,
-            name,
-            price: parsedPrice,
-            image,
-            quantity: 1
+          productId,
+          name: product.name,
+          price: product.price,
+          image: product.image, // ✅ lấy ảnh từ sản phẩm
+          quantity: 1
         });
+      }
+  
+      res.redirect('/cart');
+    } catch (err) {
+      console.error('Lỗi khi thêm vào giỏ hàng:', err);
+      res.status(500).send('Lỗi server khi thêm vào giỏ hàng');
     }
-
-    res.redirect('/cart');
-});
+  });
+  
 
 // Hiển thị trang thanh toán (bước 1: chọn phương thức và hiển thị mã QR)
 router.get('/checkout', (req, res) => {

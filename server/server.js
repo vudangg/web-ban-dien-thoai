@@ -101,13 +101,30 @@ app.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
   const u = await User.findOne({ email });
   if (!u) return res.send("Email không tồn tại. <a href='/forgot-password'>Thử lại</a>");
-  try { await sendResetPasswordEmail(email, u._id); res.send("Đã gửi email đặt lại mật khẩu."); }
-  catch { res.send("Lỗi gửi email. Vui lòng thử lại."); }
+  try { 
+    await sendResetPasswordEmail(email, u._id); 
+    res.send("Đã gửi email đặt lại mật khẩu."); 
+  } catch { 
+    res.send("Lỗi gửi email. Vui lòng thử lại."); 
+  }
 });
 app.get('/reset-password/:token', async (req, res) => {
-  const u = await User.findOne({ resetToken: req.params.token, tokenExpiry: { $gt: Date.now() } });
-  if (!u) return res.send("Token không hợp lệ. <a href='/forgot-password'>Thử lại</a>");
-  res.render('reset-password', { token: req.params.token });
+  const { token } = req.params;
+  console.log('Received reset token:', token);
+  const user = await User.findOne({ resetToken: token });
+  if (!user) {
+    return res.send(`
+      <p>Token không hợp lệ.</p>
+      <a href="/forgot-password">Quên mật khẩu</a>
+    `);
+  }
+  if (user.tokenExpiry < Date.now()) {
+    return res.send(`
+      <p>Link đã hết hạn (hết hạn vào ${user.tokenExpiry.toLocaleString()}).</p>
+      <a href="/forgot-password">Gửi lại email đặt lại mật khẩu</a>
+    `);
+  }
+  res.render('reset-password', { token });
 });
 app.post('/reset-password', async (req, res) => {
   const { token, password, confirmPassword } = req.body;
@@ -134,7 +151,7 @@ app.get('/api/search', async (req, res) => {
 // Authenticated routes
 app.use(authMiddleware);
 
-// Admin dashboard
+// Admin dashboard page
 app.get('/admin', roleMiddleware('admin'), async (req, res) => {
   const userCount     = await User.countDocuments();
   const productCount  = await Product.countDocuments();
@@ -155,8 +172,39 @@ app.get('/profile/edit', async (req, res) => {
   const sid = req.session.user?.id;
   if (!sid) return res.redirect('/login');
   let profile = await Profile.findOne({ userId: sid });
-  if (!profile) profile = await Profile.create({ userId: sid, name: req.session.user.name, email: '', phone: '', address: '' });
-  res.render('profile', { user: profile });
+  if (!profile) {
+    profile = await Profile.create({
+      userId: sid,
+      name: req.session.user.name,
+      email: '',
+      phone: '',
+      address: ''
+    });
+  }
+  res.render('profile', { user: profile, errors: {} });
+});
+app.post('/profile', async (req, res) => {
+  const sid = req.session.user.id;
+  const { name, email, phone, address } = req.body;
+  const errors = {};
+  const emailExists = await Profile.findOne({ email, userId: { $ne: sid } });
+  if (emailExists) errors.email = 'Email đã được sử dụng. Vui lòng chọn email khác.';
+  const phoneExists = await Profile.findOne({ phone, userId: { $ne: sid } });
+  if (phoneExists) errors.phone = 'Số điện thoại đã được sử dụng. Vui lòng chọn số khác.';
+  if (Object.keys(errors).length > 0) {
+    return res.render('profile', { user: { name, email, phone, address }, errors });
+  }
+  const updated = await Profile.findOneAndUpdate(
+    { userId: sid },
+    { name, email, phone, address, updatedAt: Date.now() },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  );
+  req.session.user.name = updated.name;
+  res.redirect('/userProfile');
+});
+app.get('/profile', async (req, res) => {
+  const user = await User.findById(req.session.userId);
+  res.render('editProfile', { user, errors: null });
 });
 app.post('/profile', async (req, res) => {
   const sid = req.session.user.id;
@@ -172,17 +220,11 @@ app.post('/profile', async (req, res) => {
 
 // Home
 app.get('/', async (req, res) => {
-  // Sản phẩm hot sale
   const hotSaleProducts = await Product.find({ hotSale: true }).limit(6);
-
-  // Các sản phẩm khác (ví dụ mới nhất)
   const otherProducts = await Product.find({ hotSale: false })
     .sort({ _id: -1 })
     .limit(12);
-
-  // Thời gian kết thúc khuyến mãi
   const hotSaleEndTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
-
   res.render('index', {
     hotSaleProducts,
     otherProducts,
@@ -191,8 +233,6 @@ app.get('/', async (req, res) => {
     cart: req.session.cart || []
   });
 });
-
-
 
 // Cart
 app.post('/cart/add', (req, res) => {
@@ -212,16 +252,79 @@ app.use('/', profileRoutes);
 
 // Seed categories and admin
 async function seedInitialData() {
-  const defaultCategories = ["Điện thoại","Laptop","Phụ kiện","Thời trang"];
-  for (const name of defaultCategories) {
-    if (!await Category.findOne({ name })) await Category.create({ name });
+  const categoryCount = await Category.countDocuments();
+  if (categoryCount === 0) {
+    const defaultCategories = ["Điện thoại", "Laptop", "Phụ kiện", "Thời trang"];
+    await Category.insertMany(defaultCategories.map(name => ({ name })));
+    console.log('✅ Đã seed các danh mục mặc định');
   }
   if (!await Admin.findOne({ username: 'admin' })) {
-    const hashed = await bcrypt.hash('admin123',10);
+    const hashed = await bcrypt.hash('admin123', 10);
     await Admin.create({ username: 'admin', password: hashed, role: 'admin' });
     console.log('✅ Admin mặc định đã tạo: admin/admin123');
   }
 }
+
+// —— CẬP NHẬT /api/dashboard-data —— 
+app.get('/api/dashboard-data', async (req, res) => {
+  try {
+    const year = new Date().getFullYear();
+    const start = new Date(year, 0, 1);
+    const end   = new Date(year, 11, 31, 23, 59, 59);
+
+    // 1) Thống kê số sản phẩm theo tháng
+    const productAgg = await Product.aggregate([
+      { $match: { createdAt: { $gte: start, $lte: end } } },
+      { $group: {
+          _id: { $month: '$createdAt' },
+          count: { $sum: 1 }
+      }},
+      { $sort: { '_id': 1 } }
+    ]);
+    const monthlyProductCount = Array.from({ length: 12 }, (_, i) => {
+      const m = productAgg.find(p => p._id === i + 1);
+      return m ? m.count : 0;
+    });
+
+    // 2) Thống kê số lượng theo danh mục
+    const categories = {};
+    const cats = await Category.find().lean();
+    for (let c of cats) {
+      const cnt = await Product.countDocuments({ category: c._id });
+      categories[c.name] = cnt;
+    }
+
+    // 3) Thống kê người dùng theo role
+    const usersAgg = await User.aggregate([
+      { $group: { _id: '$role', count: { $sum: 1 } } }
+    ]);
+    const users = {};
+    usersAgg.forEach(u => { users[u._id] = u.count; });
+
+    res.json({ monthlyProductCount, categories, users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+// ——————————————————————————
+
+/**
+ * 404 & 500 handlers
+ */
+app.use((req, res) => {
+  res.status(404).render('error', {
+    statusCode: 404,
+    message: 'Trang bạn tìm không tồn tại.'
+  });
+});
+app.use((err, req, res, next) => {
+  console.error("Lỗi server:", err);
+  res.status(500).render('error', {
+    statusCode: 500,
+    message: 'Đã xảy ra lỗi trong hệ thống. Vui lòng thử lại sau.'
+  });
+});
 
 const targetUri = "mongodb+srv://annguyen1212004:0963631472An@project.e63li.mongodb.net/?retryWrites=true&w=majority";
 mongoose.connect(targetUri, { serverSelectionTimeoutMS:5000, socketTimeoutMS:45000, autoIndex:true })

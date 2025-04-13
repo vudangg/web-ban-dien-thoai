@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 // Hiển thị form đăng ký
 router.get('/', (req, res) => {
-    res.render('register');
+    res.render('register', { successMessage: null }); // ✅ truyền biến mặc định
 });
 
 // Xử lý form đăng ký
@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
 
     try {
         await newUser.save();
-        res.send("Đăng ký thành công! <a href='/login'>Đăng nhập ngay</a>");
+        res.render('register', { successMessage: 'Đăng ký thành công! Bạn có thể đăng nhập ngay.' });
     } catch (error) {
         console.error("Lỗi khi đăng ký:", error);
         res.send("Đã có lỗi xảy ra. Vui lòng thử lại.");

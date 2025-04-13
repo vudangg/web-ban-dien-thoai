@@ -1,54 +1,96 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh toán</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanh toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
-        <h1 class="text-2xl font-bold text-center">Chọn phương thức thanh toán</h1>
-        <% if (cart && cart.length > 0) { %>
-            <div class="mt-4 p-4 border rounded-lg bg-gray-50">
-                <h2 class="text-lg font-semibold">Sản phẩm trong giỏ hàng</h2>
-                <ul class="mt-2 space-y-2">
-                    <% cart.forEach(item => { %>
-                        <li class="flex justify-between border-b pb-1">
-                            <span><%= item.name %> (x<%= item.quantity || 1 %>)</span>
-                            <span class="text-red-500">
-                                <%= (parseFloat(item.price || 0) * (item.quantity || 1)).toLocaleString() %> VND
-                            </span>
-                        </li>
-                    <% }); %>
-                </ul>
-                <% let totalPrice = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0); %>
-                <div class="mt-4 text-right font-semibold">
-                    Tổng cộng: <span class="text-red-500"><%= totalPrice.toLocaleString() %> VND</span>
-                </div>
-            </div>
-        <% } else { %>
-            <p class="text-center text-gray-500 mt-4">Giỏ hàng của bạn đang trống.</p>
-        <% } %>
-        <form action="/checkout" method="POST" class="mt-5">
-            <div class="flex flex-col space-y-3">
-                <label class="flex items-center space-x-2">
-                    <input type="radio" name="paymentMethod" value="momo" required>
-                    <span>Thanh toán qua MoMo</span>
-                </label>
-                <label class="flex items-center space-x-2">
-                    <input type="radio" name="paymentMethod" value="bank">
-                    <span>Internet Banking</span>
-                </label>
-                <label class="flex items-center space-x-2">
-                    <input type="radio" name="paymentMethod" value="cod">
-                    <span>Thanh toán khi nhận hàng (COD)</span>
-                </label>
-            </div>
-            <button type="submit" class="mt-5 w-full bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
-                Tiến hành thanh toán
-            </button>
-        </form>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white py-4 shadow">
+    <div class="container mx-auto px-6">
+      <h1 class="text-2xl font-bold">🛒 Thanh toán giỏ hàng</h1>
     </div>
+  </header>
+
+  <!-- Main -->
+  <main class="container mx-auto flex-grow px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <!-- Left: Phương thức thanh toán -->
+      <section class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Chọn phương thức thanh toán</h2>
+        <form action="/checkout" method="POST" class="space-y-4">
+
+          <label class="flex items-center p-4 border rounded-lg hover:border-red-500 transition">
+            <input type="radio" name="paymentMethod" value="momo" required class="form-radio h-5 w-5 text-red-600" />
+            <i class="fab fa-cc-amazon-pay text-2xl text-red-600 ml-4"></i>
+            <span class="ml-3 text-gray-700">Thanh toán qua MoMo</span>
+          </label>
+
+          <label class="flex items-center p-4 border rounded-lg hover:border-red-500 transition">
+            <input type="radio" name="paymentMethod" value="bank" class="form-radio h-5 w-5 text-red-600" />
+            <i class="fas fa-university text-2xl text-blue-600 ml-4"></i>
+            <span class="ml-3 text-gray-700">Internet Banking</span>
+          </label>
+
+          <label class="flex items-center p-4 border rounded-lg hover:border-red-500 transition">
+            <input type="radio" name="paymentMethod" value="cod" class="form-radio h-5 w-5 text-red-600" />
+            <i class="fas fa-truck text-2xl text-green-600 ml-4"></i>
+            <span class="ml-3 text-gray-700">Thanh toán khi nhận hàng (COD)</span>
+          </label>
+
+          <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">
+            Tiến hành thanh toán
+          </button>
+        </form>
+      </section>
+
+      <!-- Right: Tóm tắt đơn hàng -->
+      <section class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
+        <% if (cart && cart.length > 0) { %>
+          <ul class="space-y-3">
+            <% cart.forEach(item => { %>
+              <% const imgSrc = item.image ? (item.image.startsWith('/') ? item.image : '/uploads/' + item.image) : '/uploads/placeholder.png'; %>
+              <li class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                  <img src="<%= imgSrc %>" alt="<%= item.name %>" class="w-12 h-12 object-cover rounded" />
+                  <span class="text-gray-800"><%= item.name %> x<%= item.quantity || 1 %></span>
+                </div>
+                <span class="text-red-600 font-semibold">
+                  <%= (parseFloat(item.price || 0) * (item.quantity || 1)).toLocaleString('vi-VN') %> VND
+                </span>
+              </li>
+            <% }); %>
+          </ul>
+          <% const totalPrice = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0); %>
+          <div class="mt-6 border-t pt-4 flex justify-between font-bold text-lg">
+            <span>Tổng cộng:</span>
+            <span class="text-red-600"><%= totalPrice.toLocaleString('vi-VN') %> VND</span>
+          </div>
+        <% } else { %>
+          <p class="text-center text-gray-500">Giỏ hàng của bạn đang trống.</p>
+        <% } %>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6 mt-12">
+    <div class="container mx-auto px-6 text-center">
+      <p>&copy; <%= new Date().getFullYear() %> Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 flex justify-center space-x-6 text-sm">
+        <a href="/privacy-policy" class="hover:underline hover:text-gray-300 transition">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline hover:text-gray-300 transition">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline hover:text-gray-300 transition">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
+
 </body>
 </html>

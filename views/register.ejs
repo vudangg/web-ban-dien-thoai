@@ -1,80 +1,76 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký tài khoản</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng ký tài khoản</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen">
+<body class="bg-cover bg-center h-screen" style="background-image: url('/uploads/Background.png');">
+  <div class="flex items-center justify-center h-full bg-black bg-opacity-40">
+    <div class="backdrop-blur-lg bg-white/10 border border-gray-300/30 p-8 rounded-xl shadow-2xl w-full max-w-md text-white">
+      <h2 class="text-3xl font-bold text-center mb-6">ĐĂNG KÝ</h2>
 
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-center mb-6 text-red-600">Đăng ký tài khoản</h2>
-        
-        <form action="/register" method="POST" class="space-y-4">
-            <!-- Tên -->
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Tên:</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    required 
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
-                />
-            </div>
+      <!-- THÔNG BÁO THÀNH CÔNG -->
+      <% if (successMessage) { %>
+        <div class="bg-green-500 text-white p-3 mb-4 rounded">
+          <%= successMessage %>
+        </div>
+      <% } %>      
 
-            <!-- Tên đăng nhập -->
-            <div>
-                <label for="username" class="block text-sm font-medium text-gray-700">Tên đăng nhập:</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    required 
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
-                />
-            </div>
+      <form action="/register" method="POST" class="space-y-4">
+        <!-- Tên -->
+        <div>
+          <label for="name" class="block mb-1 text-sm font-medium">Tên đầy đủ</label>
+          <div class="relative">
+            <input type="text" id="name" name="name" required placeholder="Nhập tên của bạn..."
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">👤</span>
+          </div>
+        </div>
 
-            <!-- Email -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required 
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
-                />
-            </div>
+        <!-- Tên đăng nhập -->
+        <div>
+          <label for="username" class="block mb-1 text-sm font-medium">Tên đăng nhập</label>
+          <div class="relative">
+            <input type="text" id="username" name="username" required placeholder="Chọn tên đăng nhập..."
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">🆔</span>
+          </div>
+        </div>
 
-            <!-- Mật khẩu -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Mật khẩu:</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
-                />
-            </div>
+        <!-- Email -->
+        <div>
+          <label for="email" class="block mb-1 text-sm font-medium">Email</label>
+          <div class="relative">
+            <input type="email" id="email" name="email" required placeholder="Nhập email..."
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">✉️</span>
+          </div>
+        </div>
 
-            <!-- Nút đăng ký -->
-            <div>
-                <button 
-                    type="submit" 
-                    class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 transition"
-                >
-                    Đăng ký
-                </button>
-            </div>
-        </form>
-        
-        <p class="mt-4 text-center text-gray-600">
-            <a href="/login" class="text-red-600 hover:underline">Quay lại đăng nhập</a>
-        </p>
+        <!-- Mật khẩu -->
+        <div>
+          <label for="password" class="block mb-1 text-sm font-medium">Mật khẩu</label>
+          <div class="relative">
+            <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu..."
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">🔒</span>
+          </div>
+        </div>
+
+        <!-- Nút đăng ký -->
+        <button type="submit"
+          class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-md transition duration-200">
+          Đăng Ký
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm">
+        Đã có tài khoản?
+        <a href="/login" class="text-green-300 hover:underline ml-1">Đăng nhập</a>
+      </p>
     </div>
-
+  </div>
 </body>
 </html>

@@ -1,23 +1,58 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác nhận thanh toán</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xác nhận thanh toán</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg text-center">
-        <h1 class="text-2xl font-bold text-center">Xác nhận thanh toán</h1>
-        <p class="mt-2 text-gray-700"><%= paymentInfo.message %></p>
-        
-        <% if (paymentInfo.qrImage) { %>
-            <img src="<%= paymentInfo.qrImage %>" alt="Mã QR thanh toán" class="mx-auto mt-4 w-48 h-48">
-        <% } %>
-        
-        <form action="/complete-checkout" method="POST" class="mt-6 text-center">
-            <button type=\"submit\" class=\"bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600\">Xác nhận thanh toán</button>
-        </form>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white py-4 shadow-md">
+    <div class="container mx-auto px-6 flex items-center justify-between">
+      <h1 class="text-xl sm:text-2xl font-bold">🔔 Xác nhận thanh toán</h1>
+      <a href="/" class="flex items-center text-white hover:text-gray-200">
+        <i class="fas fa-home mr-2"></i>Trang chủ
+      </a>
     </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-6 py-10">
+    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 text-center">
+      <i class="fas fa-credit-card text-red-500 text-4xl mb-4"></i>
+      <h2 class="text-2xl font-semibold mb-2">Xác nhận thanh toán</h2>
+      <p class="text-gray-700 mb-6"><%= paymentInfo.message %></p>
+
+      <% if (paymentInfo.qrImage) { %>
+        <div class="mb-6">
+          <img src="<%= paymentInfo.qrImage %>" alt="Mã QR thanh toán"
+               class="mx-auto w-48 h-48 object-cover rounded-lg shadow-md" />
+        </div>
+      <% } %>
+
+      <form action="/complete-checkout" method="POST">
+        <button type="submit"
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
+          ✅ Hoàn tất thanh toán
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer (duy nhất) -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 space-x-6">
+        <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
+
 </body>
 </html>
