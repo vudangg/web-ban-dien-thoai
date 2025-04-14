@@ -19,10 +19,10 @@ router.get('/orders', isAuthenticated, isAdmin, async (req, res) => {
 });
 
 // Route dành cho khách hàng
-router.get('/customer-orders', isAuthenticated, async (req, res) => {
+router.get('/customerOrders', isAuthenticated, async (req, res) => {
   console.log("User trong customer-orders:", req.user);
   try {
-    const orders = await Order.find({ userId: req.user._id });
+    const orders = await Order.find({ userId: req.user.id });
     res.render('customerOrders', { user: req.user, orders });
   } catch (error) {
     console.error("Lỗi khi lấy đơn hàng:", error);

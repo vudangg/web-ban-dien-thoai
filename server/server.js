@@ -355,7 +355,7 @@ app.get('/admin/orders', isAuthenticated, isAdmin, async (req, res) => {
 // Route dành cho khách hàng: Lấy đơn hàng của chính user đó
 app.get('/customerOrders', isAuthenticated, async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user._id }).populate('items.productId');
+    const orders = await Order.find({ userId: req.user.id }).populate('items.productId');
     res.render('customerOrders', { user: req.user, orders });
   } catch (error) {
     console.error("Lỗi khi lấy đơn hàng của khách hàng:", error);
