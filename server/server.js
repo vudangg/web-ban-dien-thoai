@@ -245,13 +245,35 @@ app.get('/', async (req, res) => {
 
 // Cart
 app.post('/cart/add', (req, res) => {
-  const { productId, name, price } = req.body;
+  // Lấy thêm color và capacity từ form
+  const { productId, name, price, color, capacity } = req.body;
   if (!req.session.cart) req.session.cart = [];
-  const exist = req.session.cart.find(p => p.productId === productId);
-  if (exist) exist.quantity++;
-  else req.session.cart.push({ productId, name, price, quantity: 1 });
+
+  // Tìm xem đã có cùng productId + color + capacity chưa
+  const exist = req.session.cart.find(item =>
+    item.productId === productId &&
+    item.color      === color &&
+    item.capacity   === capacity
+  );
+
+  if (exist) {
+    // Nếu trùng tuỳ chọn, tăng số lượng
+    exist.quantity++;
+  } else {
+    // Khởi tạo một mục mới với color & capacity
+    req.session.cart.push({
+      productId,
+      name,
+      price: priceNum,
+      color,
+      capacity,
+      quantity: 1
+    });
+  }
+  req.session.successMessage = 'Đã thêm vào giỏ hàng!';
   res.redirect('/cart');
 });
+
 
 // Multer (used in productRoutes)
 const upload = multer({ dest: path.join(__dirname, '../uploads'), limits: { fileSize: 10*1024*1024 } });

@@ -21,14 +21,40 @@
     <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg flex-1">
         <h2 class="text-2xl font-bold"><%= product.name %></h2>
         <img src="<%= product.image %>" alt="<%= product.name %>" class="w-64 h-64 object-cover mx-auto">
-        <p class="text-gray-700 mt-2">Giá: <%= product.price %> VND</p>
+        <p class="text-gray-700 mt-2">Giá: <%= Number(product.price).toLocaleString('vi-VN') %> VND</p>
         <p class="text-gray-500">
           Danh mục: 
           <%= product.category ? product.category.name : "Chưa có danh mục" %>
         </p>
 
-        <form action="/cart/add" method="POST" class="mt-4">
+        <!-- Form thêm vào giỏ hàng -->
+        <form action="/cart/add" method="POST" class="mt-4 space-y-4">
             <input type="hidden" name="productId" value="<%= product._id %>">
+            <input type="hidden" name="name" value="<%= product.name %>">
+            <input type="hidden" name="price" value="<%= product.price %>">
+
+            <% if (product.colors && product.colors.length) { %>
+            <div>
+                <label for="color" class="block text-gray-700 mb-1 font-medium">Chọn màu:</label>
+                <select name="color" id="color" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none">
+                  <% product.colors.forEach(c => { %>
+                    <option value="<%= c %>"><%= c %></option>
+                  <% }) %>
+                </select>
+            </div>
+            <% } %>
+
+            <% if (product.capacities && product.capacities.length) { %>
+            <div>
+                <label for="capacity" class="block text-gray-700 mb-1 font-medium">Chọn dung lượng:</label>
+                <select name="capacity" id="capacity" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none">
+                  <% product.capacities.forEach(sz => { %>
+                    <option value="<%= sz %>"><%= sz %> GB</option>
+                  <% }) %>
+                </select>
+            </div>
+            <% } %>
+
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
               Thêm vào giỏ
             </button>

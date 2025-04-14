@@ -17,7 +17,6 @@
     referrerpolicy="no-referrer"
   />
 </head>
-
 <body class="bg-gray-100 flex flex-col min-h-screen">
   <!-- Header -->
   <header class="bg-red-600 text-white px-4 py-3 shadow flex items-center justify-between">
@@ -48,22 +47,16 @@
         </svg>
         <span>Đơn hàng của tôi</span>
       </a>
-      
-      <!-- Giỏ hàng -->
       <a href="/cart" class="bg-white text-red-600 px-3 py-2 rounded-lg flex items-center font-semibold shadow hover:bg-gray-100">
         <i class="fas fa-cart-shopping mr-2"></i>
         Giỏ hàng
       </a>
-
-      <!-- Admin -->
       <% if (user && user.role === 'admin') { %>
         <a href="/admin" class="bg-white text-red-600 px-3 py-2 rounded-lg flex items-center font-semibold shadow hover:bg-gray-100">
           <i class="fas fa-user-shield mr-2"></i>
           Admin
         </a>
       <% } %>
-
-      <!-- Login/Logout -->
       <% if (user) { %>
         <a href="/logout" class="hover:underline">Đăng xuất</a>
       <% } else { %>
@@ -81,7 +74,6 @@
           alt="<%= product.name %>"
           class="w-64 h-64 object-cover rounded-xl border border-gray-300 shadow-md"
         />
-
         <div class="mt-4 text-center">
           <h2 class="text-2xl font-bold text-gray-800 mb-2"><%= product.name %></h2>
           <p class="text-gray-700 mb-2"><strong>Mô tả:</strong> <%= product.description %></p>
@@ -90,11 +82,34 @@
           </p>
         </div>
 
-        <!-- Thêm vào giỏ hàng -->
-        <form action="/cart/add" method="POST" class="w-full mt-5">
+        <!-- Form thêm vào giỏ hàng -->
+        <form action="/cart/add" method="POST" class="w-full mt-5 space-y-4">
           <input type="hidden" name="productId" value="<%= product._id %>" />
-          <input type="hidden" name="name" value="<%= product.name %>" />
-          <input type="hidden" name="price" value="<%= product.price %>" />
+          <input type="hidden" name="name"      value="<%= product.name %>" />
+          <input type="hidden" name="price"     value="<%= product.price %>" />
+
+          <% if (product.colors && product.colors.length) { %>
+            <div>
+              <label for="color" class="block text-gray-700 mb-1 font-medium">Chọn màu:</label>
+              <select name="color" id="color" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none">
+                <% product.colors.forEach(color => { %>
+                  <option value="<%= color %>"><%= color %></option>
+                <% }) %>
+              </select>
+            </div>
+          <% } %>
+
+          <% if (product.capacities && product.capacities.length) { %>
+            <div>
+              <label for="capacity" class="block text-gray-700 mb-1 font-medium">Chọn dung lượng:</label>
+              <select name="capacity" id="capacity" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none">
+                <% product.capacities.forEach(cap => { %>
+                  <option value="<%= cap %>"><%= cap %> GB</option>
+                <% }) %>
+              </select>
+            </div>
+          <% } %>
+
           <button
             type="submit"
             class="w-full bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition duration-200"
@@ -103,7 +118,6 @@
           </button>
         </form>
 
-        <!-- Xoá sản phẩm (admin) -->
         <% if (user && user.role === 'admin') { %>
           <button
             type="button"
@@ -139,18 +153,14 @@
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
         })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message) {
-              alert(data.message);
-              window.location.href = "/products";
-            } else {
-              alert("Có lỗi xảy ra khi xóa sản phẩm.");
-            }
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message || 'Đã xảy ra lỗi.');
+            window.location.href = '/products';
           })
-          .catch((error) => {
-            console.error("Lỗi:", error);
-            alert("Lỗi khi xóa sản phẩm.");
+          .catch(err => {
+            console.error(err);
+            alert('Lỗi khi xóa sản phẩm.');
           });
       }
     }

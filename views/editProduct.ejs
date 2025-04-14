@@ -42,23 +42,38 @@
                     class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-400"><%= product.description %></textarea>
         </div>
 
+        <!-- Màu sắc (ngăn cách bằng dấu ,) -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Màu sắc (ngăn cách bằng dấu ,)</label>
+          <input type="text" name="colors"
+                 placeholder="Ví dụ: Đen, Trắng, Xanh"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.colors ? product.colors.join(', ') : '' %>">
+        </div>
+
+        <!-- Dung lượng (GB, ngăn cách bằng dấu ,) -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Dung lượng (GB, ngăn cách bằng dấu ,)</label>
+          <input type="text" name="capacities"
+                 placeholder="Ví dụ: 64, 128, 256"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.capacities ? product.capacities.join(', ') : '' %>">
+        </div>
+
         <!-- Danh mục -->
         <div>
           <label class="block text-gray-800 font-medium mb-1">Danh mục</label>
           <select name="category"
                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
             <% categories.forEach(category => { %>
-              <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? "selected" : "" %>>
-                <%= category.name %>
-              </option>
+              <option value="<%= category._id %>" <%= product.category && product.category._id.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
             <% }); %>
           </select>
         </div>
 
         <!-- Hot Sale -->
         <div class="flex items-center space-x-3">
-          <input type="checkbox" name="hotSale" class="form-checkbox text-red-500"
-            <% if (product.hotSale) { %> checked <% } %> >
+          <input type="checkbox" name="hotSale" class="form-checkbox text-red-500" <%= product.hotSale ? 'checked' : '' %> >
           <span class="text-gray-700 font-medium">Gắn nhãn Hot Sale 🔥</span>
         </div>
 
@@ -76,9 +91,7 @@
         <div>
           <label class="block text-gray-800 font-medium mb-1">Chọn ảnh mới (nếu muốn thay đổi)</label>
           <input type="file" name="image" accept="image/*"
-                 class="w-full p-2 border border-gray-300 rounded-lg bg-white file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0 file:text-sm file:font-semibold
-                        file:bg-red-500 file:text-white hover:file:bg-red-600">
+                 class="w-full p-2 border border-gray-300 rounded-lg bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-500 file:text-white hover:file:bg-red-600">
         </div>
 
         <!-- Nút lưu -->

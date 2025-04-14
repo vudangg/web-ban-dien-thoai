@@ -12,41 +12,54 @@ router.get('/cart', (req, res) => {
 
 // Thêm sản phẩm vào giỏ hàng
 router.post('/cart/add', async (req, res) => {
-  try {
-    const { productId } = req.body;
+  const { productId, name, price, color, capacity } = req.body;
 
+  if (!req.session.cart) req.session.cart = [];
+
+  const exist = req.session.cart.find(item =>
+    item.productId === productId &&
+    item.color === color &&
+    item.capacity === capacity
+  );
+
+  if (exist) {
+    exist.quantity++;
+  } else {
+    // ✅ Truy vấn sản phẩm để lấy ảnh
     const product = await Product.findById(productId);
-    if (!product) return res.status(404).send('Không tìm thấy sản phẩm');
+    const image = product?.image || "";
 
-    if (!req.session.cart) req.session.cart = [];
-
-    const existing = req.session.cart.find(p => p.productId === productId);
-    if (existing) {
-      existing.quantity++;
-    } else {
-      req.session.cart.push({
-        productId,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: 1
-      });
-    }
-
-    res.redirect('/cart');
-  } catch (err) {
-    console.error('Lỗi khi thêm vào giỏ hàng:', err);
-    res.status(500).send('Lỗi server khi thêm vào giỏ hàng');
+    req.session.cart.push({
+      productId,
+      name,
+      price,
+      color,
+      capacity,
+      image, 
+      quantity: 1
+    });
   }
+
+  res.redirect('/cart');
 });
+
+
 
 // Xoá sản phẩm khỏi giỏ hàng
 router.post('/cart/remove', (req, res) => {
-  const { productId } = req.body;
+  const { productId, color, capacity } = req.body; // ✅ lấy đủ 3 giá trị
+
   if (!req.session.cart) req.session.cart = [];
-  req.session.cart = req.session.cart.filter(item => item.productId !== productId);
+
+  req.session.cart = req.session.cart.filter(item =>
+    !(item.productId === productId &&
+      item.color === color &&
+      item.capacity === capacity)
+  );
+
   res.redirect('/cart');
 });
+
 
 // Trang chọn phương thức thanh toán
 router.get('/checkout', (req, res) => {
@@ -107,8 +120,10 @@ router.post('/complete-checkout', async (req, res) => {
       items: cart.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
-        price: item.price
-      })),
+        price: item.price,
+        color: item.color,
+        capacity: item.capacity
+      })),      
       total,
       status: 'pending'
     });

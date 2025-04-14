@@ -59,7 +59,15 @@
               <li class="flex justify-between items-center">
                 <div class="flex items-center space-x-3">
                   <img src="<%= imgSrc %>" alt="<%= item.name %>" class="w-12 h-12 object-cover rounded" />
-                  <span class="text-gray-800"><%= item.name %> x<%= item.quantity || 1 %></span>
+                  <div class="text-gray-800">
+                    <div><%= item.name %> x<%= item.quantity || 1 %></div>
+                    <% if (item.color) { %>
+                      <div class="text-sm text-gray-500">Màu: <%= item.color %></div>
+                    <% } %>
+                    <% if (item.capacity) { %>
+                      <div class="text-sm text-gray-500">Dung lượng: <%= item.capacity %> GB</div>
+                    <% } %>
+                  </div>
                 </div>
                 <span class="text-red-600 font-semibold">
                   <%= (parseFloat(item.price || 0) * (item.quantity || 1)).toLocaleString('vi-VN') %> VND

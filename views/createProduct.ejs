@@ -49,6 +49,24 @@
                     class="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
         </div>
 
+        <!-- Màu sắc -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Màu sắc (ngăn cách bằng dấu ,)</label>
+          <input type="text" name="colors"
+                 placeholder="Ví dụ: Đen, Trắng, Xanh"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.colors ? product.colors.join(', ') : '' %>">
+        </div>
+
+        <!-- Dung lượng -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Dung lượng (GB, ngăn cách bằng dấu ,)</label>
+          <input type="text" name="capacities"
+                 placeholder="Ví dụ: 64, 128, 256"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.capacities ? product.capacities.join(', ') : '' %>">
+        </div>
+
         <!-- Danh mục -->
         <div>
           <label class="block text-gray-800 font-medium mb-1">Danh mục</label>

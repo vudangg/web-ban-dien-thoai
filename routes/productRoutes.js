@@ -17,13 +17,12 @@ if (!fs.existsSync(uploadDir)) {
 // Cấu hình Multer để upload ảnh
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../uploads")); 
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
-
 const upload = multer({ storage: storage });
 
 // Tự động thêm danh mục vào MongoDB nếu chưa có
@@ -48,26 +47,19 @@ initializeCategories();
 router.get('/', async (req, res) => {
     try {
         let products;
-        // Nhận category từ query (vd: /products?category=Phụ kiện)
         let category = req.query.category || "";
-
         if (category) {
-            // Nếu giá trị category là ObjectId hợp lệ thì truy vấn trực tiếp
             if (mongoose.Types.ObjectId.isValid(category)) {
                 products = await Product.find({ category }).sort({ _id: -1 });
             } else {
-                // Nếu không, coi đó là tên danh mục và tìm _id tương ứng
                 const categoryObj = await Category.findOne({ name: category });
-                if (categoryObj) {
-                    products = await Product.find({ category: categoryObj._id }).sort({ _id: -1 });
-                } else {
-                    products = [];
-                }
+                products = categoryObj
+                    ? await Product.find({ category: categoryObj._id }).sort({ _id: -1 })
+                    : [];
             }
         } else {
             products = await Product.find().sort({ _id: -1 });
         }
-
         res.render('productList', { title: 'Danh sách sản phẩm', products, category });
     } catch (error) {
         console.error("❌ Lỗi lấy danh sách sản phẩm:", error);
@@ -75,13 +67,14 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Hiển thị form tạo sản phẩm
 router.get("/create", isAdmin, async (req, res) => {
     try {
         const categories = await Category.find();
         res.render("createProduct", {
             title: "Thêm sản phẩm mới",
             categories,
-            product: {} // ✅ thêm dòng này để tránh lỗi EJS khi check product.hotSale
+            product: {} // tránh lỗi khi dùng product trong EJS
         });
     } catch (error) {
         console.error("❌ Lỗi lấy danh mục:", error);
@@ -89,32 +82,36 @@ router.get("/create", isAdmin, async (req, res) => {
     }
 });
 
-
+// Xử lý tạo sản phẩm
 router.post("/create", isAdmin, upload.single("image"), async (req, res) => {
     try {
         const { name, price, description, category } = req.body;
-        const hotSale = !!req.body.hotSale; // ✅ thêm dòng này để lấy checkbox
+        const hotSale = !!req.body.hotSale;
+        // Parse colors và capacities
+        const colors = req.body.colors
+            ? req.body.colors.split(',').map(s => s.trim()).filter(s => s)
+            : [];
+        const capacities = req.body.capacities
+            ? req.body.capacities.split(',').map(n => Number(n.trim())).filter(n => !isNaN(n))
+            : [];
 
-        // Kiểm tra dữ liệu bắt buộc
         if (!name || !price || !description || !category) {
             return res.status(400).send("❌ Vui lòng nhập đầy đủ thông tin.");
         }
-
         const categoryExists = await Category.findById(category);
         if (!categoryExists) return res.status(400).send("❌ Danh mục không hợp lệ");
 
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
-
-        // ✅ Gộp tất cả lại 1 lần tạo sản phẩm
         const newProduct = new Product({
             name,
             price,
             description,
             category,
             image: imageUrl,
-            hotSale // <-- ✅ gán giá trị hotSale vào đây
+            hotSale,
+            colors,
+            capacities
         });
-
         await newProduct.save();
         res.redirect("/products");
     } catch (error) {
@@ -122,22 +119,22 @@ router.post("/create", isAdmin, upload.single("image"), async (req, res) => {
         res.status(500).send("Lỗi tạo sản phẩm");
     }
 });
-//Tìm kiếm sản phẩm 
+
+// Tìm kiếm sản phẩm
 router.get("/search", async (req, res) => {
     const query = req.query.q;
     try {
-      const products = await Product.find({ name: { $regex: query, $options: "i" } });
-      
-      if (products.length === 1) {
-        res.render("productDetail", { product: products[0] });
-      } else {
-        res.render("searchResults", { products, query });
-      }
+        const products = await Product.find({ name: { $regex: query, $options: "i" } });
+        if (products.length === 1) {
+            res.render("productDetail", { product: products[0] });
+        } else {
+            res.render("searchResults", { products, query });
+        }
     } catch (err) {
-      console.error(err);
-      res.status(500).send("Lỗi server");
+        console.error(err);
+        res.status(500).send("Lỗi server");
     }
-  });
+});
 
 // Hiển thị chi tiết sản phẩm
 router.get("/:id", async (req, res) => {
@@ -155,7 +152,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Hiển thị form chỉnh sửa sản phẩm
-router.get("/edit/:id", isAdmin,async (req, res) => {
+router.get("/edit/:id", isAdmin, async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         const categories = await Category.find();
@@ -168,9 +165,17 @@ router.get("/edit/:id", isAdmin,async (req, res) => {
 });
 
 // Xử lý cập nhật sản phẩm
-router.post("/edit/:id", isAdmin,upload.single("image"), async (req, res) => {
+router.post("/edit/:id", isAdmin, upload.single("image"), async (req, res) => {
     try {
         const { name, price, description, category } = req.body;
+        const hotSale = !!req.body.hotSale;
+        const colors = req.body.colors
+            ? req.body.colors.split(',').map(s => s.trim()).filter(s => s)
+            : [];
+        const capacities = req.body.capacities
+            ? req.body.capacities.split(',').map(n => Number(n.trim())).filter(n => !isNaN(n))
+            : [];
+
         if (!name || !price || !description || !category) {
             return res.status(400).send("❌ Vui lòng nhập đầy đủ thông tin.");
         }
@@ -181,15 +186,12 @@ router.post("/edit/:id", isAdmin,upload.single("image"), async (req, res) => {
         if (!categoryExists) return res.status(400).send("❌ Danh mục không hợp lệ");
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).send("❌ Không tìm thấy sản phẩm");
-        const hotSale = !!req.body.hotSale;
-        let updateData = { name, price, description, category, hotSale }; // ✅
+
+        let updateData = { name, price, description, category, hotSale, colors, capacities };
         if (req.file) {
-            // Xóa ảnh cũ nếu có
             if (product.image) {
                 const oldImagePath = path.join(uploadDir, path.basename(product.image));
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
+                if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
             }
             updateData.image = `/uploads/${req.file.filename}`;
         }
@@ -201,24 +203,18 @@ router.post("/edit/:id", isAdmin,upload.single("image"), async (req, res) => {
     }
 });
 
-// Xóa sản phẩm (sử dụng phương thức DELETE)
-router.delete("/delete/:id", isAdmin,async (req, res) => {
+// Xóa sản phẩm
+router.delete("/delete/:id", isAdmin, async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).send("❌ ID không hợp lệ");
         }
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).send("❌ Không tìm thấy sản phẩm");
-
-        // Xóa ảnh nếu có
         if (product.image) {
             const imagePath = path.join(uploadDir, path.basename(product.image));
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
+            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
         }
-
-        // Xóa sản phẩm khỏi MongoDB
         await Product.findByIdAndDelete(req.params.id);
         res.status(200).send({ message: 'Sản phẩm đã được xóa thành công.' });
     } catch (error) {
@@ -226,4 +222,5 @@ router.delete("/delete/:id", isAdmin,async (req, res) => {
         res.status(500).send("Lỗi xóa sản phẩm");
     }
 });
+
 module.exports = router;
