@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-cover bg-center h-screen" style="background-image: url('/uploads/Background.png');">
+  <div class="flex items-center justify-center h-full bg-black bg-opacity-40">
+    <div class="backdrop-blur-lg bg-white/10 border border-gray-300/30 p-8 rounded-xl shadow-2xl w-full max-w-md text-white">
+      <h2 class="text-3xl font-bold text-center mb-6">ĐĂNG NHẬP</h2>
+
+      <form action="/login" method="POST" class="space-y-4">
+        <div>
+          <label class="block mb-1 text-sm font-medium">Tài khoản</label>
+          <div class="relative">
+            <input type="text" name="username" placeholder="Nhập tài khoản..." required
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">✉️</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block mb-1 text-sm font-medium">Mật khẩu</label>
+          <div class="relative">
+            <input type="password" name="password" placeholder="Nhập mật khẩu..." required
+              class="w-full p-3 pl-10 rounded-md bg-white/20 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-green-400"/>
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white/70">🔒</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" class="accent-green-400" />
+            <span>Lưu mật khẩu</span>
+          </label>
+          <a href="/forgot-password" class="text-green-300 hover:underline">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-md transition duration-200">
+          Đăng Nhập
+        </button>
+      </form>
+
+      <div class="text-center mt-6 text-sm">
+        <p>Tạo tài khoản mới  →
+          <a href="/register" class="ml-1 px-3 py-1 border border-white rounded-md bg-white/20 hover:bg-white/30 transition">
+            Click Here
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <header class="bg-red-600 text-white flex items-center justify-between px-6 py-2">
+        <!-- Logo và tên trang -->
+        <div class="flex items-center space-x-2">
+            <img src="/uploads/logo.png" alt="Logo" class="h-12 w-auto object-contain">
+            <span class="text-xl font-bold">TECHNOLOGY</span>
+        </div>
+    
+        <!-- Các liên kết -->
+        <nav class="flex items-center space-x-6">
+            <a href="/" class="hover:underline">Trang chủ</a>
+            <% if (user && (user.role === 'admin' || user.role === 'moderator')) { %>
+            <a href="/products" class="hover:underline">Sản phẩm</a>
+            <% } %>    
+            <!-- Tên người dùng -->
+            <div class="bg-red-400 px-3 py-1 rounded-lg flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5.121 17.804A7.963 7.963 0 0112 15c1.657 0 3.183.507 4.436 1.361M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span><%= user.name %></span>
+            </div>
+    
+            <a href="/logout" class="hover:underline">Đăng xuất</a>
+        </nav>
+    </header>      
+
+    <main class="container mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg flex-1">
+        <h2 class="text-xl font-semibold mb-4">Danh sách sản phẩm trong giỏ hàng</h2>
+        <% if (cart && cart.length > 0) { %>
+            <ul class="space-y-4">
+                <% cart.forEach(product => { %>
+                    <li class="flex items-center justify-between p-4 border rounded-lg shadow-md bg-gray-50">
+                        <div>
+                            <h2 class="text-lg font-semibold"><%= product.name %></h2>
+                            <% if (product.color) { %>
+                              <p class="text-gray-600 text-sm">Màu: <%= product.color %></p>
+                            <% } %>
+                            <% if (product.capacity) { %>
+                              <p class="text-gray-600 text-sm">Dung lượng: <%= product.capacity %> GB</p>
+                            <% } %>
+                            <p class="text-gray-700 mt-1"><strong>Giá:</strong> 
+                                <span class="text-red-500 font-bold">
+                                    <%= Number(product.price).toLocaleString('vi-VN') %> VND
+                                </span>
+                            </p>                            
+                            <p class="text-gray-700">Số lượng: <%= product.quantity || 1 %></p>
+                        </div>
+                        <form action="/cart/remove" method="POST">
+                            <input type="hidden" name="productId" value="<%= product.productId %>">
+                            <input type="hidden" name="color" value="<%= product.color %>">
+                            <input type="hidden" name="capacity" value="<%= product.capacity %>">
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                Xóa
+                            </button>
+                        </form>
+                    </li>
+                <% }); %>
+            </ul>
+            <div class="mt-6 text-right font-semibold text-lg">
+                Tổng cộng: <span class="text-red-500">
+                    <% let totalPrice = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0); %>
+                    <%= totalPrice.toLocaleString('vi-VN') %> VND
+                </span>
+            </div>
+            <div class="mt-6 text-right">
+                <a href="/checkout" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                    Thanh toán
+                </a>
+            </div>
+        <% } else { %>
+            <p class="text-center text-gray-500">Giỏ hàng của bạn đang trống.</p>
+        <% } %>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto text-center">
+          <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+          <nav class="mt-4 space-x-6">
+            <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+            <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+            <a href="/contact" class="hover:underline">Liên hệ</a>
+          </nav>
+        </div>
+    </footer>
+</body>
+</html>

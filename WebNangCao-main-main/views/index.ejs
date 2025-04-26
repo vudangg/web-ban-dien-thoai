@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ - CellphoneS Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Banner Slider */
+    #banner-slider {
+      position: relative;
+      overflow: hidden;
+      height: 20rem; /* Chiều cao banner */
+    }
+  
+    .banner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem; /* Khoảng cách bên trong */
+      transition: opacity 0.3s ease, z-index 0.3s ease;
+    }
+  
+    .banner img {
+      max-height: 16rem; /* Chiều cao tối đa của hình ảnh */
+      object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
+    }
+  
+    .banner h2 {
+      font-size: 2.5rem; /* Kích thước tiêu đề */
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+  
+    .banner p {
+      font-size: 1.5rem; /* Kích thước chữ mô tả */
+      color: #333; /* Màu chữ */
+      margin-bottom: 0.5rem;
+    }
+  
+    .banner a {
+      background-color: #e60023; /* Màu nền nút */
+      color: white; /* Màu chữ nút */
+      padding: 12px 24px; /* Kích thước nút */
+      border-radius: 5px; /* Bo góc nút */
+      text-decoration: none; /* Loại bỏ gạch chân */
+      font-size: 1.2rem; /* Kích thước chữ trong nút */
+      transition: background-color 0.3s ease;
+    }
+  
+    .banner a:hover {
+      background-color: #c4001f; /* Màu nền khi hover */
+    }
+  
+    /* Sidebar */
+    aside {
+      width: 250px; /* Rộng khoảng giống ảnh */
+      max-height: 550px; /* Giới hạn chiều cao */
+      background-color: white;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+    }
+  
+    /* Danh sách trong sidebar */
+    aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+  
+    /* Các mục trong sidebar */
+    aside li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Để icon bên phải */
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+  
+    /* Icon bên trái và tên danh mục */
+    aside li span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  
+    /* Icon bên trái */
+    aside li span img {
+      width: 24px;
+      height: 24px;
+    }
+  
+    /* Icon mũi tên bên phải */
+    aside li::after {
+      content: ">";
+      font-size: 1rem;
+      color: #666;
+    }
+  
+    .hot-sale-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Tự động điều chỉnh số cột */
+      gap: 1.5rem; /* Khoảng cách giữa các sản phẩm */
+    }
+  
+    .hot-sale-item {
+      background-color: white;
+      color: black;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+  
+    .hot-sale-item:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(-5px);
+    }
+  
+    .hot-sale-item img {
+      width: 100%;
+      height: 10rem; /* Chiều cao hình ảnh */
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+  
+    .hot-sale-item h3 {
+      font-size: 1.125rem; /* Kích thước tiêu đề */
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+  
+    .hot-sale-item p {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  
+    .hot-sale-item .line-through {
+      text-decoration: line-through;
+      color: #999;
+    }
+  
+    .hot-sale-item button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  
+    #countdown {
+      color: yellow;
+    }
+    #searchResults {
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    #searchResults::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #searchResults::-webkit-scrollbar-thumb {
+      background-color: #cbd5e0;
+      border-radius: 3px;
+    }
+
+    #searchResults a {
+      transition: background-color 0.2s;
+    }
+
+    #searchResults a:hover {
+      background-color: #f3f4f6;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white py-2">
+    <div class="max-w-screen-xl mx-auto flex items-center justify-between px-4">
+      <!-- Logo -->
+      <div class="flex items-center gap-x-2">
+        <img src="/uploads/logo.png" alt="Logo" class="h-16 w-auto">
+        <span class="text-lg font-bold">TECHNOLOGY</span>
+      </div>
+  
+      <!-- Search -->
+      <div class="flex-1 mx-6 max-w-lg relative">
+        <input 
+          type="text" 
+          id="searchInput"
+          placeholder="Bạn cần tìm gì?" 
+          class="w-full px-4 py-2 rounded-lg text-black"
+        >
+        <!-- Kết quả tìm kiếm -->
+        <div id="searchResults" class="absolute w-full mt-1 bg-white rounded-lg shadow-lg hidden"></div>
+      </div>
+      <div class="flex items-center gap-x-6">
+        <a href="/customerOrders" class="flex items-center gap-1 text-white hover:underline transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13l-1.5-6M9 21h.01M15 21h.01" />
+          </svg>
+          <span>Đơn hàng của tôi</span>
+        </a>
+        
+        <% if (user) { %>
+          <!-- Giỏ hàng -->
+          <a href="/cart" class="relative flex flex-col items-center text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13l-1.5-6M7 13h10M9 21h.01M15 21h.01" />
+            </svg>
+            <span>Giỏ hàng</span>
+            <% if (cart && cart.length > 0) { %>
+              <span class="absolute -top-2 -right-2 bg-white text-red-600 rounded-full text-xs px-2">
+                <%= cart.length %>
+              </span>
+            <% } %>
+          </a>
+      
+          <!-- Tài khoản -->
+          <a href="/userProfile" class="flex items-center gap-2 bg-red-500 px-3 py-1 rounded-lg hover:bg-red-400 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 0112 15a4 4 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span><%= user.name || "Khách hàng" %></span>
+          </a>
+          <!-- Đăng xuất -->
+          <form action="/logout" method="get" class="ml-4">
+          <button type="submit" class="hover:underline text-white">Đăng xuất</button>
+          </form>
+        <% } else { %>
+          <a href="/login" class="hover:underline text-white">Đăng nhập</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout chính -->
+  <div class="flex container mx-auto mt-6">
+    
+    <!-- Sidebar -->
+    <aside class="w-44 bg-white p-3 shadow rounded hidden md:block">
+      <ul class="space-y-1 text-gray-800 text-sm">
+        
+        <!-- Điện thoại -->
+        <li class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 2h8a2 2 0 012 2v16a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2z" />
+          </svg>
+          <a href="/products?category=Điện thoại" class="flex-1 hover:underline">Điện thoại, Tablet</a>
+        </li>
+    
+        <!-- Laptop -->
+        <li class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h18v11H3z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2 16h20" />
+          </svg>
+          <a href="/products?category=Laptop" class="flex-1 hover:underline">Laptop</a>
+        </li>
+    
+        <!-- Phụ kiện -->
+        <li class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-yellow-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75A3.75 3.75 0 1112 8.25a3.75 3.75 0 010 7.5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 00-.21-1.74l1.58-1.23a.75.75 0 00.16-1.06l-1.5-2.6a.75.75 0 00-1.03-.3l-1.86.77a7.52 7.52 0 00-2.34-1.35l-.28-1.96A.75.75 0 0012 2.25h-3a.75.75 0 00-.75.66l-.28 1.96a7.52 7.52 0 00-2.34 1.35l-1.86-.77a.75.75 0 00-1.03.3l-1.5 2.6a.75.75 0 00.16 1.06l1.58 1.23A7.5 7.5 0 004.5 12c0 .6.07 1.18.21 1.74l-1.58 1.23a.75.75 0 00-.16 1.06l1.5 2.6c.22.38.7.52 1.07.3l1.86-.77a7.52 7.52 0 002.34 1.35l.28 1.96c.06.41.41.7.83.7h3c.42 0 .77-.29.83-.7l.28-1.96a7.52 7.52 0 002.34-1.35l1.86.77c.37.22.85.08 1.07-.3l1.5-2.6a.75.75 0 00-.16-1.06l-1.58-1.23c.14-.56.21-1.14.21-1.74z" />
+          </svg>
+          <a href="/products?category=Phụ kiện" class="flex-1 hover:underline">Phụ kiện</a>
+        </li>
+    
+      </ul>
+    </aside>
+      
+
+    <!-- Nội dung chính -->
+    <main class="flex-1 md:ml-6">
+      <!-- Banner quảng cáo tự động chuyển đổi -->
+      <section class="relative overflow-hidden rounded-lg mb-6">
+        <div id="banner-slider" class="relative h-80"> <!-- Tăng chiều cao từ h-64 lên h-80 -->
+          <!-- Banner 1 -->
+          <div class="banner absolute inset-0 bg-white text-black flex items-center justify-between px-6 transition-opacity duration-500 opacity-100">
+            <div class="flex flex-col justify-center">
+              <h2 class="text-4xl font-bold mb-2">OPPO FIND N5</h2>
+              <p class="text-xl font-semibold text-gray-700 mb-2">Mỏng Nhất. Mạnh Mẽ Nhất.</p>
+              <p class="text-red-600 font-bold text-2xl mb-4">Giá niêm yết: 44.990.000đ</p>
+              <a href="#" class="bg-red-500 text-white py-3 px-6 rounded hover:bg-red-400">Đặt Trước Ngay</a>
+            </div>
+            <img src="/uploads/OPPO FIND N5.png" alt="OPPO FIND N5" class="h-64 object-contain">
+          </div>
+          <!-- Banner 2 -->
+          <div class="banner absolute inset-0 bg-white text-black flex items-center justify-between px-6 transition-opacity duration-500 opacity-0">
+            <div class="flex flex-col justify-center">
+              <h2 class="text-4xl font-bold mb-2">IPHONE 16 PRO MAX</h2>
+              <p class="text-xl font-semibold text-gray-700 mb-2">Lên đời ngay</p>
+              <p class="text-red-600 font-bold text-2xl mb-4">Giá tốt nhất thị trường</p>
+              <a href="#" class="bg-red-500 text-white py-3 px-6 rounded hover:bg-red-400">Đặt Trước Ngay</a>
+            </div>
+            <img src="/uploads/1742719504851.png" alt="IPHONE 16 PRO MAX" class="h-64 object-contain">
+          </div>
+          <!-- Banner 3 -->
+          <div class="banner absolute inset-0 bg-white text-black flex items-center justify-between px-6 transition-opacity duration-500 opacity-0">
+            <div class="flex flex-col justify-center">
+              <h2 class="text-4xl font-bold mb-2">REDMI NOTE 14 5G</h2>
+              <p class="text-xl font-semibold text-gray-700 mb-2">Ưu đãi tốt chốt ngay</p>
+              <p class="text-red-600 font-bold text-2xl mb-4">Giá chỉ từ 6.990.000đ</p>
+              <a href="#" class="bg-red-500 text-white py-3 px-6 rounded hover:bg-red-400">Đặt Trước Ngay</a>
+            </div>
+            <img src="/uploads/redmi-note14.png" alt="REDMI NOTE 14 5G" class="h-64 object-contain">
+          </div>
+        </div>
+        <!-- Nút điều hướng -->
+        <button id="prev-banner" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700">&#10094;</button>
+        <button id="next-banner" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full hover:bg-gray-700">&#10095;</button>
+      </section>
+
+      <!-- Hot Sale -->
+  <section class="bg-red-500 text-white p-6 rounded-lg shadow mb-8">
+    <h2 class="text-3xl font-bold mb-4">🔥 HOT SALE CUỐI TUẦN</h2>
+    <p class="text-lg mb-6">
+      Kết thúc sau: <span id="countdown" class="font-bold">00 : 00 : 00 : 00</span>
+    </p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% hotSaleProducts.forEach(p => { %>
+        <div class="bg-white text-black rounded-lg p-4 shadow hover:shadow-lg">
+          <img src="<%= p.image %>" alt="" class="w-full h-32 object-contain mb-2">
+          <h3 class="font-semibold"><%= p.name %></h3>
+          <p class="text-red-600 font-bold"><%= p.price.toLocaleString('vi-VN') %> VND</p>
+          <a href="/products/<%= p._id %>" class="text-blue-500 text-sm hover:underline">Xem chi tiết</a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- Sản phẩm mới -->
+  <section class="container mx-auto mb-12">
+    <h2 class="text-2xl font-semibold mb-4">🆕 Sản phẩm mới</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <% otherProducts.forEach(p => { %>
+        <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg">
+          <img src="<%= p.image %>" alt="" class="w-full h-40 object-contain mb-2">
+          <h3 class="font-semibold text-gray-800"><%= p.name %></h3>
+          <p class="text-red-600 font-bold"><%= p.price.toLocaleString('vi-VN') %> VND</p>
+          <a href="/products/<%= p._id %>" class="text-blue-500 text-sm hover:underline">Xem chi tiết</a>
+        </div>
+        <% }) %>
+       </div>
+      </section>
+       </main>
+     </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6 mt-12">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 space-x-6">
+        <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Banner slider JS
+    const banners = document.querySelectorAll('.banner');
+    let currentBanner = 0;
+    const prevButton = document.getElementById('prev-banner');
+    const nextButton = document.getElementById('next-banner');
+
+    function showBanner(index) {
+      banners.forEach((b, i) => {
+        b.style.opacity = i === index ? '1' : '0';
+        b.style.zIndex = i === index ? '10' : '0';
+      });
+    }
+    prevButton.addEventListener('click', () => {
+      currentBanner = (currentBanner - 1 + banners.length) % banners.length;
+      showBanner(currentBanner);
+    });
+    nextButton.addEventListener('click', () => {
+      currentBanner = (currentBanner + 1) % banners.length;
+      showBanner(currentBanner);
+    });
+    setInterval(() => {
+      currentBanner = (currentBanner + 1) % banners.length;
+      showBanner(currentBanner);
+    }, 5000);
+    showBanner(currentBanner);
+
+    // Search JS
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    let timeoutId;
+
+    searchInput.addEventListener('input', e => {
+      const term = e.target.value.trim();
+      clearTimeout(timeoutId);
+      if (!term) return searchResults.classList.add('hidden');
+      timeoutId = setTimeout(() => fetch(`/api/search?q=${encodeURIComponent(term)}`)
+        .then(res => res.json())
+        .then(products => {
+          if (products.length) {
+            searchResults.innerHTML = products.map(p => 
+              `<a href="/products/${p._id}" class="block p-3 hover:bg-gray-100 flex items-center gap-3">
+                <img src="${p.image}" alt="${p.name}" class="w-12 h-12 object-contain">
+                <div><div class="font-medium">${p.name}</div><div class="text-red-600">${Number(p.price).toLocaleString('vi-VN')} VND</div></div>
+              </a>`).join('');
+          } else {
+            searchResults.innerHTML = `<div class="p-3 text-gray-500">Không tìm thấy sản phẩm nào</div>`;
+          }
+          searchResults.classList.remove('hidden');
+        }), 300);
+    });
+    document.addEventListener('click', e => {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+    // Countdown
+    (function(){
+      const end = new Date('<%= hotSaleEndTime %>').getTime();
+      const el = document.getElementById('countdown');
+      function upd(){
+        let d = end - Date.now();
+        if (d<0) d=0;
+        const days    = Math.floor(d/86400000);
+        const hours   = Math.floor(d%86400000/3600000);
+        const mins    = Math.floor(d%3600000/60000);
+        const secs    = Math.floor(d%60000/1000);
+        el.textContent =
+          String(days).padStart(2,'0')+' : '+
+          String(hours).padStart(2,'0')+' : '+
+          String(mins).padStart(2,'0')+' : '+
+          String(secs).padStart(2,'0');
+      }
+      upd(); setInterval(upd,1000);
+    })();
+  </script>
+</body>
+</html>

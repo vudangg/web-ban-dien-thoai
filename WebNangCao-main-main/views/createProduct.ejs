@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white p-6 shadow-md">
+    <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+      <h1 class="text-2xl font-bold">➕ Thêm sản phẩm mới</h1>
+      <nav class="mt-2 sm:mt-0 space-x-4 text-sm sm:text-base">
+        <a href="/" class="hover:underline">🏠 Trang chủ</a>
+        <a href="/products" class="hover:underline">📦 Danh sách sản phẩm</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Form -->
+  <main class="flex-grow container mx-auto mt-10 px-6">
+    <div class="bg-white shadow-xl rounded-2xl p-8 max-w-2xl mx-auto">
+
+      <form action="/products/create" method="POST" enctype="multipart/form-data" class="space-y-6">
+
+        <!-- Tên sản phẩm -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Tên sản phẩm</label>
+          <input type="text" name="name" required
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+        </div>
+
+        <!-- Giá sản phẩm -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Giá</label>
+          <input type="text" id="priceDisplay" required
+                 placeholder="VD: 1.000.000"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+          <input type="hidden" id="price" name="price">
+        </div>
+
+        <!-- Mô tả -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Mô tả</label>
+          <textarea name="description" required
+                    class="w-full p-3 border border-gray-300 rounded-lg h-32 resize-none focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+        </div>
+
+        <!-- Màu sắc -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Màu sắc (ngăn cách bằng dấu ,)</label>
+          <input type="text" name="colors"
+                 placeholder="Ví dụ: Đen, Trắng, Xanh"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.colors ? product.colors.join(', ') : '' %>">
+        </div>
+
+        <!-- Dung lượng -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Dung lượng (GB, ngăn cách bằng dấu ,)</label>
+          <input type="text" name="capacities"
+                 placeholder="Ví dụ: 64, 128, 256"
+                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                 value="<%= product.capacities ? product.capacities.join(', ') : '' %>">
+        </div>
+
+        <!-- Danh mục -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Danh mục</label>
+          <select name="category" required
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+            <% if (categories.length > 0) { %>
+              <% categories.forEach(category => { %>
+                <option value="<%= category._id %>"><%= category.name %></option>
+              <% }); %>
+            <% } else { %>
+              <option value="" disabled>Không có danh mục nào</option>
+            <% } %>
+          </select>
+        </div>
+
+        <!-- Hình ảnh -->
+        <div>
+          <label class="block text-gray-800 font-medium mb-1">Hình ảnh sản phẩm</label>
+          <div class="flex items-center gap-4">
+            <input type="file" name="image" accept="image/*" required
+                   class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-500 file:text-white hover:file:bg-red-600">
+          </div>
+        </div>
+
+        <!-- Hot Sale -->
+        <div>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="hotSale" class="form-checkbox text-red-500">
+            <span class="ml-2 text-gray-700 font-medium">Gắn nhãn Hot Sale 🔥</span>
+          </label>
+        </div>
+
+        <!-- Nút gửi -->
+        <div class="text-right">
+          <button type="submit"
+                  class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200">
+            ✅ Thêm sản phẩm
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </main>
+  <footer class="bg-gray-800 text-white py-6 mt-12">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 Cửa Hàng Điện Thoại - Bản quyền thuộc về chúng tôi.</p>
+      <nav class="mt-4 space-x-6">
+        <a href="/privacy-policy" class="hover:underline">Chính sách bảo mật</a>
+        <a href="/terms" class="hover:underline">Điều khoản sử dụng</a>
+        <a href="/contact" class="hover:underline">Liên hệ</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- Script định dạng giá -->
+  <script>
+    const priceDisplay = document.getElementById('priceDisplay');
+    const priceHidden = document.getElementById('price');
+
+    priceDisplay.addEventListener('input', (e) => {
+      const rawValue = e.target.value.replace(/\./g, '').replace(/\D/g, '');
+      if (rawValue) {
+        const formattedValue = Number(rawValue).toLocaleString('de-DE');
+        priceDisplay.value = formattedValue;
+        priceHidden.value = rawValue;
+      } else {
+        priceHidden.value = '';
+      }
+    });
+
+    document.querySelector('form').addEventListener('submit', () => {
+      priceHidden.value = priceDisplay.value.replace(/\./g, '');
+    });
+  </script>
+
+</body>
+</html>
